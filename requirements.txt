@@ -1,0 +1,16 @@
+Django>=4.2,<5
+djangorestframework
+drf-spectacular
+psycopg2-binary
+python-dotenv
+django-environ
+celery[redis]
+django-celery-results
+boto3
+minio
+gunicorn
+uvicorn
+pytest 
+pytest-django 
+factory-boy
+flower

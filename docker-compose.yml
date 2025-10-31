@@ -1,0 +1,102 @@
+version: '3.9'
+
+services:
+  # -------------------
+  # Django application
+  # -------------------
+  web:
+    build:
+      context: .
+    container_name: ${PROJECT_NAME}_web
+    command: >
+      bash -lc "python manage.py migrate --noinput &&
+                python manage.py collectstatic --noinput &&
+                gunicorn service_desk.wsgi:application --bind 0.0.0.0:8000"
+    env_file: .env
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  # -------------------
+  # Celery worker
+  # -------------------
+  worker:
+    build:
+      context: .
+    container_name: ${PROJECT_NAME}_worker
+    command: celery -A service_desk worker --loglevel=info
+    env_file: .env
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+      - postgres
+    restart: always
+
+  # -------------------
+  # Celery beat (планировщик задач)
+  # -------------------
+  beat:
+    build:
+      context: .
+    container_name: ${PROJECT_NAME}_beat
+    command: celery -A service_desk beat --loglevel=info
+    env_file: .env
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+      - postgres
+    restart: always
+
+  # # -------------------
+  # # Flower (мониторинг задач Celery)
+  # # -------------------
+  # flower:
+  #   build:
+  #     context: .
+  #   container_name: ${PROJECT_NAME}_flower
+  #   command: >
+  #     flower --url_prefix=/flower --broker=redis://redis:6379/0
+  #   ports:
+  #     - "5555:5555"
+  #   depends_on:
+  #     - redis
+  #   restart: always
+
+  # -------------------
+  # PostgreSQL
+  # -------------------
+  postgres:
+    image: postgres:16
+    container_name: ${PROJECT_NAME}_postgres
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  # -------------------
+  # Redis
+  # -------------------
+  redis:
+    image: redis:7
+    container_name: ${PROJECT_NAME}_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  postgres_data:
+  redis_data:
