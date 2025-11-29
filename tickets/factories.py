@@ -23,12 +23,11 @@ class CategoryTypeFactory(factory.django.DjangoModelFactory):
 class EmployeeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Employee
-    firstname, second_name = fake.name().split(' ')
+    first_name, second_name = fake.name().split(' ')
     surname = "Alekseevich"
-    email = fake.email()
+    email = factory.Sequence(lambda n: f'employee{n}@example.com')
     office = SubFactory('tickets.factories.OfficeFactory')
-    role = random.choice(Employee.ROLE_CHOICES)
-    specialization = CategoryTypeFactory()
+    role = random.choice(["role_1", "role_2", "role_3"])
     parent = None
 
 class OfficeFactory(factory.django.DjangoModelFactory):
