@@ -40,9 +40,8 @@ class OfficeFactory(factory.django.DjangoModelFactory):
     work_time = random.choice(['9:00 - 20:00', '8:00 - 21:00', '00:00 - 24:00'])
     @factory.post_generation
     def main_worker(self, create, extracted, **kwargs):
-        if create and extracted:
+        if create:
             self.main_worker = EmployeeFactory(office = self)
-
 
 
 class TaskFactory(factory.django.DjangoModelFactory):
