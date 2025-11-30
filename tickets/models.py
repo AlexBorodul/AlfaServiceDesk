@@ -7,7 +7,7 @@ class Office(models.Model):
     address = models.CharField(max_length=200, blank=True)
     type = models.CharField(max_length=30, blank=True)
     work_time = models.CharField(max_length=100, blank=True)
-    main_worker = models.ForeignKey('Employee', null=True, blank=True, on_delete=models.SET_NULL, related_name='main_of')
+    main_worker = models.ForeignKey('Employee', null=True, on_delete=models.SET_NULL, related_name='main_of')
 
     def __str__(self):
         return self.name
