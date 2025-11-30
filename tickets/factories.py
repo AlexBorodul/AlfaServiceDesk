@@ -1,11 +1,8 @@
 import factory
-from factory import SubFactory
+from factory import SubFactory, faker
 from tickets.models import Employee, ActionType, CategoryType, Office, Action, Attachment, Task
-from faker import Faker
 import random
 import decimal
-
-fake = Faker()
 
 class ActionTypeFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -23,7 +20,8 @@ class CategoryTypeFactory(factory.django.DjangoModelFactory):
 class EmployeeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Employee
-    first_name, second_name = fake.name().split(' ')
+    first_name = factory.faker.Faker('first_name', locale = 'it_IT')
+    second_name = factory.faker.Faker('last_name', locale = 'it_IT')
     surname = "Alekseevich"
     email = factory.Sequence(lambda n: f'employee{n}@example.com')
     office = SubFactory('tickets.factories.OfficeFactory')
@@ -35,7 +33,7 @@ class OfficeFactory(factory.django.DjangoModelFactory):
         model = Office
     name = factory.Sequence(lambda n: "Офис под номер {}".format(n))
     parent = None
-    address = fake.address()
+    address = factory.faker.Faker('address')
     type = random.choice(['Офис уровня 1', 'Офис уровня 2', 'Офис уровня 3'])
     work_time = random.choice(['9:00 - 20:00', '8:00 - 21:00', '00:00 - 24:00'])
     @factory.post_generation
