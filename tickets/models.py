@@ -7,7 +7,7 @@ class Office(models.Model):
     address = models.CharField(max_length=200, blank=True)
     type = models.CharField(max_length=30, blank=True)
     work_time = models.CharField(max_length=100, blank=True)
-    main_worker = models.ForeignKey('Employee', null=True, blank=True, on_delete=models.SET_NULL, related_name='main_of')
+    main_worker = models.ForeignKey('Employee', null=True, on_delete=models.SET_NULL, related_name='main_of')
 
     def __str__(self):
         return self.name
@@ -54,7 +54,7 @@ class Task(models.Model):
     priority = models.CharField(max_length=30, default='normal')
     category = models.ForeignKey(CategoryType, null=True, blank=True, on_delete=models.SET_NULL)
     office = models.ForeignKey(Office, null=True, blank=True, on_delete=models.SET_NULL)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
+    status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='waiting')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     actual_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
