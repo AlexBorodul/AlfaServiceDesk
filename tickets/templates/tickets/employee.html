@@ -27,7 +27,6 @@
                     <td>{{ employee.surname }}</td>
                     <td>{{ employee.email }}</td>
                     <td>{{ employee.get_role_display }}</td>
-                    <td><a href="{% url 'employee_detail' employee.id %}">View Details</a></td>
                 </tr>
             {% empty %}
                 <tr>

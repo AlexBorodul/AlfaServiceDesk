@@ -5,7 +5,8 @@ from tickets.models import Employee
 # Create your views here.
 
 
-def get_all_workers(request):
-    all_worker = Employee.objects.all()
-    return render(request, 'tickets/employee.html', {'all_worker': all_worker}) 
+def get_all_employees(request):
+    employees = Employee.objects.all()
+    print(employees)
+    return render(request, 'tickets/employee.html', {'employees': employees}) 
     

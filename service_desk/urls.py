@@ -20,5 +20,5 @@ from tickets import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("workers/", views.get_all_workers)
+    path("workers/", views.get_all_employees)
 ]
