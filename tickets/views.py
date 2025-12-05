@@ -8,5 +8,9 @@ from tickets.models import Employee
 def get_all_employees(request):
     employees = Employee.objects.all()
     print(employees)
-    return render(request, 'tickets/employee.html', {'employees': employees}) 
+    return render(request, 'tickets/employees.html', {'employees': employees}) 
     
+def get_employee_by_id(request, employee_id):
+    employee = Employee.objects.filter(id = employee_id).first()
+    print(employee)
+    return render(request, 'tickets/employee.html', {"employee": employee})

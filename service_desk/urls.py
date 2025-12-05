@@ -20,5 +20,6 @@ from tickets import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("workers/", views.get_all_employees)
+    path("workers/", views.get_all_employees),
+    path("workers/<int:employee_id>/", views.get_employee_by_id)
 ]

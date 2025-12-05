@@ -1,39 +1,23 @@
-<!-- templates/yourapp/employee_list.html -->
+<!-- templates/yourapp/employee.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee List</title>
+    <title>Employee by id</title>
 </head>
 <body>
-    <h1>Employee List</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>First Name</th>
-                <th>Second Name</th>
-                <th>Surname</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for employee in employees %}
-                <tr>
-                    <td>{{ employee.first_name }}</td>
-                    <td>{{ employee.second_name }}</td>
-                    <td>{{ employee.surname }}</td>
-                    <td>{{ employee.email }}</td>
-                    <td>{{ employee.get_role_display }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="6">No employees available.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h1>Employee</h1>
+    {% if employee %}
+            <div class="employee-details">
+                <h2>{{ employee.name }}</h2>
+                <p><strong>Имя:</strong> {{ employee.first_name }}</p>
+                <p><strong>Фамилия:</strong> {{ employee.second_name }}</p>
+                <p><strong>Отчество</strong> {{employee.surname}}</p>
+                <p><strong>Почта:</strong> {{ employee.email }}</p>
+            </div>
+    {% else %}
+        <p>Сотрудник не найден.</p>
+    {% endif %}
 </body>
 </html>
