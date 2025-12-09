@@ -3,17 +3,6 @@ from django.http import HttpResponse
 from tickets.models import Employee, Task
 from tickets.forms import TaskForm, SendEmailForm
 
-# Create your views here.
-
-
-def get_all_employees(request):
-    employees = Employee.objects.all()
-    return render(request, 'tickets/employees.html', {'employees': employees}) 
-    
-def get_employee_by_id(request, employee_id):
-    employee = Employee.objects.filter(id = employee_id).first()
-    return render(request, 'tickets/employee.html', {"employee": employee})
-
 def create_task(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
