@@ -21,5 +21,8 @@ from tickets import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("workers/", views.get_all_employees),
-    path("workers/<int:employee_id>/", views.get_employee_by_id)
+    path("workers/<int:employee_id>/", views.get_employee_by_id),
+    path("task/create", views.create_task),
+    path("email/send", views.send_message),
+    path("tasks/", views.get_tasks)
 ]
