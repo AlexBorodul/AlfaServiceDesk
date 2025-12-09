@@ -3,15 +3,16 @@ from django.http import HttpResponse
 from tickets.models import Employee, Task
 from tickets.forms import TaskForm, SendEmailForm
 
-def create_task(request):
+def all_tasks(request):
+    """При POST запросе создаём заявку, при GET-Запросе получаем её"""
+    form = TaskForm()
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
-            form.save()  # Сохраняем задачу в базе данных
-    else:
-        form = TaskForm()  # Создаем пустую форму
-
-    return render(request, 'tickets/create_task.html', {'form': form})
+            form.save() 
+    elif request.method == 'GET':
+        tasks = Task.objects.all()
+        return render(request, 'tickets/tasks.html', {"tasks": tasks, "form": form})
 
 def send_message(request):
     if request.method == 'POST':
@@ -22,7 +23,7 @@ def send_message(request):
         form = SendEmailForm()
     return render(request, 'tickets/email_form.html', {"form": form})
 
-
-def get_tasks(request):
-    tasks = Task.objects.all()
-    return render(request, 'tickets/tasks.html', {"tasks": tasks})
+def get_task(request, task_id):
+    task = Task.objects.filter(id = task_id).first()
+    return render(request, 'tickets/task.html', {'task': task})
+    
