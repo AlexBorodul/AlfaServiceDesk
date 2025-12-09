@@ -22,14 +22,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("tasks/", views.all_tasks, name = "tasks"),
     path("tasks/<int:task_id>/", views.get_task, name = 'task'),
-    path("tasks/<int:task_id>/edit", views.edit_task, name = 'edit_task')
-    # path("/api/tasks/<int:task_id>/status", views.get_task),
-    # path("/api/tasks/<int:task_id>/comment", views.todo),
-    # path("/api/tasks/<int:task_id>/transfer", views.todo),
-    # path("/api/tasks/<int:task_id>/attachment", views.todo),
-    # path("/api/tasks/<int:task_id>/feedback", views.todo),
-    # path("/api/reports/summary/", views.todo),
+    path("tasks/<int:task_id>/edit", views.edit_task, name = 'edit_task'),
+    path("login/auth", views.login, name = 'login')
+    # path("/reports/summary/", views.todo),
     # path("/api/categories", views.todo),
     # path("/api/offices", views.todo),
-    # path("/api/employees", views.todo)
 ]

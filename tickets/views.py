@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
 from tickets.models import Employee, Task
 from tickets.forms import TaskForm, SendEmailForm
@@ -37,5 +38,12 @@ def edit_task(request, task_id):
     elif request.method == 'GET':
         form = TaskForm(instance=task)
     return render(request, 'tickets/edit_task.html', {"form": form})
+
+def login(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request)
+    elif request.method == 'GET':
+        form = AuthenticationForm()
+    return render(request, 'tickets/login.html', {"form": form})
 
     
