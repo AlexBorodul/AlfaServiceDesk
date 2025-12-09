@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from tickets.models import Employee, Task
 from tickets.forms import TaskForm, SendEmailForm
@@ -26,4 +26,16 @@ def send_message(request):
 def get_task(request, task_id):
     task = Task.objects.filter(id = task_id).first()
     return render(request, 'tickets/task.html', {'task': task})
+
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, id = task_id)
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance = task)
+        if form.is_valid():
+            form.save()
+            return redirect('tasks')
+    elif request.method == 'GET':
+        form = TaskForm(instance=task)
+    return render(request, 'tickets/edit_task.html', {"form": form})
+
     

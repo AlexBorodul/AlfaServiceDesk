@@ -20,8 +20,9 @@ from tickets import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("tasks/", views.all_tasks),
-    path("tasks/<int:task_id>/", views.get_task),
+    path("tasks/", views.all_tasks, name = "tasks"),
+    path("tasks/<int:task_id>/", views.get_task, name = 'task'),
+    path("tasks/<int:task_id>/edit", views.edit_task, name = 'edit_task')
     # path("/api/tasks/<int:task_id>/status", views.get_task),
     # path("/api/tasks/<int:task_id>/comment", views.todo),
     # path("/api/tasks/<int:task_id>/transfer", views.todo),
