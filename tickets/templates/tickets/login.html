@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> <!-- Подключите ваш CSS файл -->
 </head>
 <body>
     <h2>Вход</h2>
@@ -20,8 +19,6 @@
             <p>Пожалуйста, войдите, чтобы увидеть эту страницу.</p>
         {% endif %}
     {% endif %}
-
-    <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <table>
             <tr>
@@ -37,7 +34,5 @@
         <input type="submit" value="Войти">
         <input type="hidden" name="next" value="{{ next }}">
     </form>
-
-    <p><a href="{% url 'password_reset' %}">Забыли пароль?</a></p>
 </body>
 </html>

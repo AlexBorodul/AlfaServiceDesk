@@ -20,5 +20,5 @@ import django.contrib.auth.views as auth_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", auth_views.LoginView.as_view(template_name = 'tickets/login.html'))
+    path("accounts/login/", auth_views.LoginView.as_view(template_name = 'tickets/login.html'))
 ]
