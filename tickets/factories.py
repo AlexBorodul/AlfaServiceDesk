@@ -27,7 +27,6 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     office = SubFactory('tickets.factories.OfficeFactory')
     role = factory.LazyFunction(lambda: random.choice(["role_1", "role_2", "role_3"]))
     parent = None
-    status = factory.LazyFunction(lambda: random.choice(["free", "busy", None]))
 
 class OfficeFactory(factory.django.DjangoModelFactory):
     class Meta:
