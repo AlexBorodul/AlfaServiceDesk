@@ -1,12 +1,16 @@
 from django import forms
 from django.core.validators import EmailValidator
 from django.forms import ModelForm
-from tickets.models import Task
+from tickets.models import Task, Employee
 
 EMAIL_ADDRESS_MAX_LENGTH = 256
 
 class TaskForm(ModelForm):
     files = forms.FileField(required = None)
+    worker = forms.ModelChoiceField(
+        queryset = Employee.objects.filter(status = 'FREE'),
+        label = "Исполнитель"
+    )
     class Meta:
         model = Task
         fields = ["status", "problem", "priority", "title", "category"] 

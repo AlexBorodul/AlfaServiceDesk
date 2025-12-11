@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
+from tickets.forms import TaskForm
 
 # Create your views here.
 
@@ -12,3 +13,12 @@ from django.contrib.auth import authenticate
 #         raise ValueError
 #     else:
 #         form = 
+
+def create_task(request):
+    form = TaskForm()
+    if request.method == "POST":
+        task = TaskForm(request.POST)
+        if task.is_valid():
+            task.save()
+    else: 
+        return render(request, 'tickets/task.html', {"form": form})
