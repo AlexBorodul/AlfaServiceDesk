@@ -21,6 +21,5 @@ from tickets import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/login/", auth_views.LoginView.as_view(template_name = 'tickets/login.html')),
-    path("task/", views.create_task)
+    path("accounts/login/", views.LoginAPIView.as_view())
 ]

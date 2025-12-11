@@ -1,24 +1,55 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate
-from tickets.forms import TaskForm
+from rest_framework_simplejwt.tokens import RefreshToken
+from tickets.forms import TaskForm, LoginForm
+from rest_framework.views import APIView 
+from rest_framework.response import Response
+from rest_framework import status
+from tickets.auth import authentificate
 
 # Create your views here.
 
-#TODO, Добавить получение токена при помощи TokenObtainPaiView
-# def auth(request):
-#     if request.method == "GET":
-#         user = authenticate(username = request.data['login'], password = request.data['password'])
-#         if user:
-#             return render(request)
-#         raise ValueError
-#     else:
-#         form = 
+class LoginAPIView(APIView):
 
-def create_task(request):
-    form = TaskForm()
-    if request.method == "POST":
-        task = TaskForm(request.POST)
-        if task.is_valid():
-            task.save()
-    else: 
-        return render(request, 'tickets/task.html', {"form": form})
+    def post(self, request):
+
+        data = request.POST
+
+        username = data.get('username', None)
+
+        password = data.get('password', None)
+
+        if username is None or password is None:
+
+            return Response({'error': 'Нужен и логин, и пароль'},
+
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        user = authentificate(username, password)
+
+        if user is None:
+
+            return Response({'error': 'Неверные данные'},
+
+                            status=status.HTTP_401_UNAUTHORIZED)
+
+        refresh = RefreshToken.for_user(user)
+
+        refresh.payload.update({
+
+            'user_id': user.id,
+
+            'username': user.username
+
+        })
+
+        return Response({
+
+            'refresh': str(refresh),
+
+            'access': str(refresh.access_token),
+
+        }, status=status.HTTP_200_OK)
+    
+    def get(self, request):
+        form = LoginForm()
+        return render(request, 'tickets/login.html', {'form': form})

@@ -32,3 +32,8 @@ class FeedbackForm(forms.Form):
     rating = forms.ChoiceField(choices=FEEDBACK_RATING)
     feedback = forms.CharField()
 
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length = 150, required = True, label = "Username")
+    password = forms.CharField(max_length = 150, required = True, label = "Password")
+
+
