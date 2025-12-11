@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task by id</title>
+</head>
+<body>
+    <h1>Task</h1>
+    {% if task %}
+            <div class="task-details">
+                <h2>{{ employee.name }}</h2>
+                <p><strong>Название:</strong> {{task.title}}</p>
+                <p><strong>Проблема:</strong> {{task.problem }}</p>
+                <p><strong>Автор</strong> {{task.author_id}}</p>
+                <p><strong>Работник</strong> {{task.worker_id}}</p>
+                <p><strong>Статус</strong> {{task.status}}</p>
+                <p><strong>Категория</strong> {{task.category}}</p>
+                <p><strong>Офис</strong> {{task.office}}</p>
+            </div>
+    {% else %}
+        <p>Заявка не найдена.</p>
+    {% endif %}
+</body>
+</html>

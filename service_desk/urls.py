@@ -16,7 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from tickets import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("tasks/", views.all_tasks, name = "tasks"),
+    path("tasks/<int:task_id>/", views.get_task, name = 'task'),
+    path("tasks/<int:task_id>/edit", views.edit_task, name = 'edit_task'),
+    path("login/auth", views.login, name = 'login')
+    # path("/reports/summary/", views.todo),
+    # path("/api/categories", views.todo),
+    # path("/api/offices", views.todo),
 ]

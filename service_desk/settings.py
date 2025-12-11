@@ -78,8 +78,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "service_desk.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -92,13 +90,16 @@ DATABASES = {
     }
 }
 
-import os
-from dotenv import load_dotenv
-load_dotenv()
+# import os
+# from dotenv import load_dotenv
+# load_dotenv()
 
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee by id</title>
+</head>
+<body>
+    <h1>Employee</h1>
+    {% if employee %}
+            <div class="employee-details">
+                <h2>{{ employee.name }}</h2>
+                <p><strong>Имя:</strong> {{ employee.first_name }}</p>
+                <p><strong>Фамилия:</strong> {{ employee.second_name }}</p>
+                <p><strong>Отчество</strong> {{employee.surname}}</p>
+                <p><strong>Почта:</strong> {{ employee.email }}</p>
+            </div>
+    {% else %}
+        <p>Сотрудник не найден.</p>
+    {% endif %}
+</body>
+</html>
