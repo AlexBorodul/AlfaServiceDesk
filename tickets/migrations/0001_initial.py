@@ -72,6 +72,7 @@ class Migration(migrations.Migration):
                         max_length=20,
                     ),
                 ),
+                ("status", models.CharField(choices = [("FREE", "free"), ("BUSY", "busy")], null = True, blank = True))
             ],
         ),
         migrations.CreateModel(
