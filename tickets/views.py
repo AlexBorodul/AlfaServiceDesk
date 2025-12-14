@@ -1,49 +1,130 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponse
-from tickets.models import Employee, Task
-from tickets.forms import TaskForm, SendEmailForm
+from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import Http404
 
-def all_tasks(request):
-    """При POST запросе создаём заявку, при GET-Запросе получаем её"""
-    form = TaskForm()
-    if request.method == 'POST':
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            form.save() 
-    elif request.method == 'GET':
-        tasks = Task.objects.all()
-        return render(request, 'tickets/tasks.html', {"tasks": tasks, "form": form})
+from tickets.models import Task, CategoryType
+from tickets.forms import TaskForm, SendEmailForm, FeedbackForm
 
-def send_message(request):
-    if request.method == 'POST':
-        form = SendEmailForm(request.POST)
-        if form.is_valid():
-            form.save()
-    else:
-        form = SendEmailForm()
-    return render(request, 'tickets/email_form.html', {"form": form})
 
-def get_task(request, task_id):
-    task = Task.objects.filter(id = task_id).first()
-    return render(request, 'tickets/task.html', {'task': task})
-
-def edit_task(request, task_id):
-    task = get_object_or_404(Task, id = task_id)
-    if request.method == 'POST':
-        form = TaskForm(request.POST, instance = task)
-        if form.is_valid():
-            form.save()
-            return redirect('tasks')
-    elif request.method == 'GET':
-        form = TaskForm(instance=task)
-    return render(request, 'tickets/edit_task.html', {"form": form})
-
-def login(request):
+def login_view(request):
+    """Авторизация"""
     if request.method == "POST":
-        form = AuthenticationForm(request)
-    elif request.method == 'GET':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            messages.success(request, f'Добро пожаловать, {user.username}!')
+            return redirect('tasks')
+        else:
+            messages.error(request, 'Неверные учетные данные')
+    else:
         form = AuthenticationForm()
+
     return render(request, 'tickets/login.html', {"form": form})
 
-    
+
+def logout_view(request):
+    """Выход из системы"""
+    auth_logout(request)
+    messages.info(request, 'Вы успешно вышли из системы.')
+    return redirect('login')
+
+
+@login_required
+def all_tasks(request):
+    """Список всех заявок пользователя"""
+    tasks = Task.objects.filter(author__email=request.user.email).order_by('-created_at')
+    return render(request, 'tickets/tasks.html', {"tasks": tasks})
+
+
+@login_required
+def create_task(request):
+    """Создание новой заявки"""
+    if request.method == 'POST':
+        form = TaskForm(request.POST, request.FILES)
+        if form.is_valid():
+            task = form.save(commit=False)
+            # Назначаем автором текущего пользователя
+            from tickets.models import Employee
+            try:
+                employee = Employee.objects.get(email=request.user.email)
+            except Employee.DoesNotExist:
+                # Создаем временного сотрудника
+                employee = Employee.objects.create(
+                    email=request.user.email,
+                    first_name=request.user.username,
+                    role='employee'
+                )
+            task.author = employee
+            task.save()
+            messages.success(request, 'Заявка успешно создана!')
+            return redirect('tasks')
+    else:
+        form = TaskForm()
+
+    # Получаем категории для выпадающего списка
+    categories = CategoryType.objects.all()
+    return render(request, 'tickets/create_task.html', {
+        "form": form,
+        "categories": categories,
+        "status_choices": Task.STATUS_CHOICES
+    })
+
+
+@login_required
+def get_task(request, task_id):
+    """Детальная страница заявки"""
+    task = get_object_or_404(Task, id=task_id)
+    return render(request, 'tickets/task.html', {'task': task})
+
+
+@login_required
+def edit_task(request, task_id):
+    """Редактирование заявки"""
+    task = get_object_or_404(Task, id=task_id)
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, request.FILES, instance=task)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Заявка успешно обновлена!')
+            return redirect('task_detail', task_id=task.id)
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, 'tickets/edit_task.html', {"form": form, "task": task})
+
+
+@login_required
+def send_message(request):
+    """Отправка email"""
+    if request.method == 'POST':
+        form = SendEmailForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Здесь будет логика отправки email
+            messages.success(request, 'Сообщение успешно отправлено!')
+            return redirect('tasks')
+    else:
+        form = SendEmailForm()
+
+    return render(request, 'tickets/email_form.html', {"form": form})
+
+
+@login_required
+def feedback(request, task_id):
+    """Обратная связь по заявке"""
+    task = get_object_or_404(Task, id=task_id)
+
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            # Здесь будет логика сохранения фидбека
+            messages.success(request, 'Спасибо за вашу оценку!')
+            return redirect('task_detail', task_id=task.id)
+    else:
+        form = FeedbackForm()
+
+    return render(request, 'tickets/feedback.html', {"form": form, "task": task})

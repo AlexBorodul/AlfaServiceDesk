@@ -1,0 +1,32 @@
+<aside class="sidebar">
+    <nav>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="{% url 'tasks' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                    <i class="fas fa-tasks"></i>
+                    <span>Мои заявки</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'create_task' %}" class="nav-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Создать заявку</span>
+                </a>
+            </li>
+            {% if user.is_superuser %}
+            <li class="nav-item">
+                <a href="/admin/" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Админ-панель</span>
+                </a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a href="{% url 'logout' %}" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>

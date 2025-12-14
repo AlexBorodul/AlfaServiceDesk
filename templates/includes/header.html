@@ -1,0 +1,23 @@
+<header class="header">
+    <div class="logo">
+        <i class="fas fa-headset"></i>
+        <span>Alfa Service Desk</span>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="user-info">
+        <div class="avatar">
+            {{ user.username|first|upper }}
+        </div>
+        <div>
+            <div class="user-name">{{ user.username }}</div>
+            <div class="user-role">
+                {% if user.is_superuser %}
+                    Администратор
+                {% else %}
+                    Сотрудник
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</header>
