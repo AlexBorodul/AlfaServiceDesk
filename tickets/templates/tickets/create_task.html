@@ -1,19 +1,94 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создать задачу</title>
-</head>
-<body>
-    <div class="container">
-        <h1>Создать новую задачу</h1>
+{% extends 'base.html' %}
 
+{% block title %}Создать заявку - Alfa Service Desk{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Создать новую заявку</h2>
+        <a href="{% url 'tasks' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+    
+    <div class="card-body">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}  <!-- Отображение формы -->
-            <button type="submit">Создать задачу</button>
+
+            <div class="form-group">
+                <label class="form-label">Заголовок *</label>
+                <input type="text" name="title" class="form-control" required
+                       placeholder="Краткое описание проблемы">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Категория</label>
+                <select name="category" class="form-control">
+                    <option value="">Выберите категорию</option>
+                    <option value="it">IT проблема</option>
+                    <option value="office">Офисное оборудование</option>
+                    <option value="hr">Кадровый вопрос</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Описание проблемы *</label>
+                <textarea name="problem" class="form-control" rows="5" required
+                          placeholder="Подробно опишите проблему..."></textarea>
+            </div>
+
+            <div class="form-row" style="display: flex; gap: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Приоритет</label>
+                    <select name="priority" class="form-control">
+                        <option value="low">Низкий</option>
+                        <option value="medium" selected>Средний</option>
+                        <option value="high">Высокий</option>
+                        <option value="critical">Критический</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Офис</label>
+                    <select name="office" class="form-control">
+                        <option value="">Выберите офис</option>
+                        <option value="main">Главный офис</option>
+                        <option value="branch1">Филиал 1</option>
+                        <option value="branch2">Филиал 2</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Исполнитель</label>
+                <select name="worker" class="form-control">
+                    <option value="">Не назначен</option>
+                    {% for employee in employees %}
+                    <option value="{{ employee.id }}">
+                        {{ employee.first_name }} {{ employee.second_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Прикрепить файлы</label>
+                <input type="file" name="attachments" multiple class="form-control">
+                <small style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.25rem;">
+                    Можно прикрепить несколько файлов
+                </small>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Создать заявку
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Сбросить
+                </button>
+            </div>
         </form>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
