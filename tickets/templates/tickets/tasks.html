@@ -1,44 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasks List</title>
-</head>
-<body>
-    <h1>Tasks List</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>title</th>
-                <th>problem</th>
-                <th>author</th>
-                <th>worker</th>
-                <th>office</th>
-                <th>status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in tasks %}
+{% extends 'base.html' %}
+
+{% block title %}Мои заявки - Alfa Service Desk{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Мои заявки</h2>
+        <a href="{% url 'create_task' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Новая заявка
+        </a>
+    </div>
+    
+    {% if tasks %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.problem }}</td>
-                    <td>{{ task.author }}</td>
-                    <td>{{ task.worker}}</td>
-                    <td>{{ task.status}}</td>
+                    <th>ID</th>
+                    <th>Тема</th>
+                    <th>Статус</th>
+                    <th>Приоритет</th>
+                    <th>Дата создания</th>
+                    <th>Действия</th>
                 </tr>
-            {% empty %}
+            </thead>
+            <tbody>
+                {% for task in tasks %}
                 <tr>
-                    <td colspan="6">No tasks available.</td>
+                    <td>#{{ task.id }}</td>
+                    <td>
+                        <a href="{% url 'task' task.id %}" class="task-title">
+                            {{ task.title|truncatechars:60 }}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ task.status }}">
+                            {{ task.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ task.priority|default:"Обычный" }}</td>
+                    <td>{{ task.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'task' task.id %}" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <h2>Создать новую задачу</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}  <!-- Отображаем форму -->
-            <button type="submit">Создать задачу</button>
-</form>
-</body>
-</html>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <h3>У вас пока нет заявок</h3>
+        <p>Создайте свою первую заявку для решения рабочего вопроса</p>
+        <a href="{% url 'create_task' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Создать заявку
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
