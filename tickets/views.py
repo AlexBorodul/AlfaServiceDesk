@@ -23,7 +23,7 @@ def login_view(request):
             messages.success(request, f'Добро пожаловать, {user.username}!')
             try:
                 access_token = AccessToken.for_user(user)
-                access_token.payload = user.id
+                access_token.payload = {"id": user.id}
                 request.session['access_token'] = access_token
             except TokenError:
                 messages.error(request, 'Failed to receive tokens')
