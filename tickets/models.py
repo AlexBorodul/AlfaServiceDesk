@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 
 class Office(models.Model):
     name = models.CharField(max_length=100)
@@ -103,3 +104,16 @@ class TimeLog(models.Model):
         if self.end_time:
             return (self.end_time - self.start_time).total_seconds() / 3600.0
         return None
+class User(AbstractUser):
+    author_id = models.ForeignKey(Employee, on_delete=models.CASCADE)
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',  
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',  
+        blank=True,
+    )
