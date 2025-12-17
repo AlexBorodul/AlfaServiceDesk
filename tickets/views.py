@@ -4,8 +4,12 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import Http404
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
 
-from tickets.models import Task, CategoryType
+from tickets.models import Task, CategoryType, Employee
 from tickets.forms import TaskForm, SendEmailForm, FeedbackForm
 
 
@@ -17,6 +21,12 @@ def login_view(request):
             user = form.get_user()
             auth_login(request, user)
             messages.success(request, f'Добро пожаловать, {user.username}!')
+            try:
+                access_token = AccessToken.for_user(user)
+                access_token.payload = {"id": user.id}
+                request.session['access_token'] = access_token
+            except TokenError:
+                messages.error(request, 'Failed to receive tokens')
             return redirect('tasks')
         else:
             messages.error(request, 'Неверные учетные данные')
@@ -32,14 +42,14 @@ def logout_view(request):
     messages.info(request, 'Вы успешно вышли из системы.')
     return redirect('login')
 
-
+@permission_classes([IsAuthenticated])
 @login_required
 def all_tasks(request):
     """Список всех заявок пользователя"""
     tasks = Task.objects.filter(author__email=request.user.email).order_by('-created_at')
     return render(request, 'tickets/tasks.html', {"tasks": tasks})
 
-
+@permission_classes([IsAuthenticated])
 @login_required
 def create_task(request):
     """Создание новой заявки"""
@@ -73,14 +83,14 @@ def create_task(request):
         "status_choices": Task.STATUS_CHOICES
     })
 
-
+@permission_classes([IsAuthenticated])
 @login_required
 def get_task(request, task_id):
     """Детальная страница заявки"""
     task = get_object_or_404(Task, id=task_id)
     return render(request, 'tickets/task.html', {'task': task})
 
-
+@permission_classes([IsAuthenticated])
 @login_required
 def edit_task(request, task_id):
     """Редактирование заявки"""
@@ -97,7 +107,7 @@ def edit_task(request, task_id):
 
     return render(request, 'tickets/edit_task.html', {"form": form, "task": task})
 
-
+@permission_classes([IsAuthenticated])
 @login_required
 def send_message(request):
     """Отправка email"""
@@ -112,7 +122,7 @@ def send_message(request):
 
     return render(request, 'tickets/email_form.html', {"form": form})
 
-
+@permission_classes([IsAuthenticated])
 @login_required
 def feedback(request, task_id):
     """Обратная связь по заявке"""
@@ -128,3 +138,8 @@ def feedback(request, task_id):
         form = FeedbackForm()
 
     return render(request, 'tickets/feedback.html', {"form": form, "task": task})
+
+@login_required
+def all_users(request):
+    users = Employee.objects.all()
+    return render(request, 'tickets/employees.html', {'employees': users})

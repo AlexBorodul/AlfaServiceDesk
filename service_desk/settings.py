@@ -43,10 +43,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
     "drf_spectacular",
     "django_celery_results",
     "tickets",
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -127,12 +128,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        # add JWT later
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+AUTH_USER_MODEL = 'tickets.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
