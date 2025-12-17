@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import Http404
 
-from tickets.models import Task, CategoryType
+from tickets.models import Task, CategoryType, Employee
 from tickets.forms import TaskForm, SendEmailForm, FeedbackForm
 
 
@@ -128,3 +128,8 @@ def feedback(request, task_id):
         form = FeedbackForm()
 
     return render(request, 'tickets/feedback.html', {"form": form, "task": task})
+
+@login_required
+def all_users(request):
+    users = Employee.objects.all()
+    return render(request, 'tickets/employees.html', {'employees': users})

@@ -6,14 +6,6 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">Заявка #{{ task.id }}</h2>
-        <div style="display: flex; gap: 0.5rem;">
-            <a href="{% url 'edit_task' task.id %}" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Редактировать
-            </a>
-            <a href="{% url 'tasks' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Назад
-            </a>
-        </div>
     </div>
 
     <div style="padding: 1.5rem;">
@@ -165,21 +157,6 @@
         <!-- Форма добавления комментария -->
         <div style="padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
             <h4 style="margin-bottom: 1rem; color: var(--gray-800);">Добавить комментарий</h4>
-            <form method="POST" action="{% url 'add_comment' task.id %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group">
-                    <textarea name="text" class="form-control" placeholder="Введите ваш комментарий..." rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Прикрепить файлы</label>
-                    <input type="file" name="attachments" multiple class="form-control">
-                </div>
-                <div style="margin-top: 1rem;">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> Отправить комментарий
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
