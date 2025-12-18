@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from tickets.models import Task, CategoryType, Employee, User
 from tickets.forms import TaskForm, SendEmailForm, FeedbackForm
+from tickets.models import Employee
+
 
 
 def login_view(request):
@@ -23,9 +25,9 @@ def login_view(request):
             messages.success(request, f'Добро пожаловать, {user.username}!')
             try:
                 access_token = AccessToken.for_user(user)
-                print(Employee.objects.filter(email = user.email).first().id)
+                Employee.objects.filter(email = user.email).first().id
                 request.session['access_token'] = Employee.objects.filter(email = user.email).first().id
-                print(request.session['access_token'])
+                request.session['access_token']
             except TokenError:
                 messages.error(request, 'Failed to receive tokens')
             return redirect('tasks')
@@ -46,10 +48,8 @@ def logout_view(request):
 @permission_classes([IsAuthenticated])
 @login_required
 def all_tasks(request):
-    print(request.session['access_token'])
     """Список всех заявок пользователя"""
     tasks = Task.objects.filter(author__id=request.session['access_token']).order_by('-created_at')
-    print(tasks)
     return render(request, 'tickets/tasks.html', {"tasks": tasks})
 
 @permission_classes([IsAuthenticated])
@@ -61,7 +61,6 @@ def create_task(request):
         if form.is_valid():
             task = form.save(commit=False)
             # Назначаем автором текущего пользователя
-            from tickets.models import Employee
             try:
                 employee = Employee.objects.get(email=request.user.email)
             except Employee.DoesNotExist:
@@ -80,11 +79,13 @@ def create_task(request):
         form = TaskForm()
 
     # Получаем категории для выпадающего списка
+    employees = Employee.objects.filter(status = 'FREE')
     categories = CategoryType.objects.all()
     return render(request, 'tickets/create_task.html', {
         "form": form,
         "categories": categories,
-        "status_choices": Task.STATUS_CHOICES
+        "status_choices": Task.STATUS_CHOICES,
+        "employees": employees
     })
 
 @permission_classes([IsAuthenticated])
