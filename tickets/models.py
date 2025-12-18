@@ -42,17 +42,25 @@ class Employee(models.Model):
 
 class Task(models.Model):
     STATUS_CHOICES = [
-        ('waiting','Waiting'),
-        ('in_progress','In progress'),
-        ('done','Done'),
-        ('rework','Rework'),
-        ('rejected','Rejected'),
+        ('waiting','Ожидает'),
+        ('in_progress','В работе'),
+        ('done','Завершена'),
+        ('rework','Исправление'),
+        ('rejected','Отклонена'),
     ]
+
+    PRIORITY_CHOICES = [
+        ("low", "Низкий"),
+        ("normal", "Обычный"),
+        ("high", "Высокий"),
+        ("critical", "Критический")
+    ]
+
     title = models.CharField(max_length=200)
     problem = models.TextField()
     author = models.ForeignKey(Employee, related_name='tasks_created', on_delete=models.CASCADE)
     worker = models.ForeignKey(Employee, null=True, blank=True, related_name='tasks_assigned', on_delete=models.SET_NULL)
-    priority = models.CharField(max_length=30, default='normal')
+    priority = models.CharField(max_length=30, choices=PRIORITY_CHOICES, default='normal')
     category = models.ForeignKey(CategoryType, null=True, blank=True, on_delete=models.SET_NULL)
     office = models.ForeignKey(Office, null=True, blank=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='waiting')

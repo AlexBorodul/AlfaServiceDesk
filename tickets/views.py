@@ -97,19 +97,20 @@ def get_task(request, task_id):
 @permission_classes([IsAuthenticated])
 @login_required
 def edit_task(request, task_id):
-    """Редактирование заявки"""
     task = get_object_or_404(Task, id=task_id)
 
-    if request.method == 'POST':
-        form = TaskForm(request.POST, request.FILES, instance=task)
+    if request.method == "POST":
+        form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Заявка успешно обновлена!')
-            return redirect('task_detail', task_id=task.id)
+            return redirect("task_detail", task_id=task.id)
     else:
         form = TaskForm(instance=task)
 
-    return render(request, 'tickets/edit_task.html', {"form": form, "task": task})
+    return render(request, "tickets/edit_task.html", {
+        "form": form,
+        "task": task
+    })
 
 @permission_classes([IsAuthenticated])
 @login_required

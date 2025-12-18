@@ -5,11 +5,20 @@ from tickets.models import Task
 
 EMAIL_ADDRESS_MAX_LENGTH = 256
 
-class TaskForm(ModelForm):
+class TaskForm(forms.ModelForm):
     files = forms.FileField(required = None)
     class Meta:
         model = Task
-        fields = ["problem", "priority", "title", "category"] 
+        exclude = ("author", "actual_cost")
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "priority": forms.Select(attrs={"class": "form-control"}),
+            "status": forms.Select(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-control"}),
+            "office": forms.Select(attrs={"class": "form-control"}),
+            "executor": forms.Select(attrs={"class": "form-control"}),
+        }
 
 
 class SendEmailForm(forms.Form):

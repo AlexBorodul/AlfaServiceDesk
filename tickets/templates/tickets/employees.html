@@ -6,8 +6,11 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">Сотрудники</h2>
+        <a href="/tasks/" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к заявкам
+        </a>
     </div>
-    
+
     {% if employees %}
     <div class="table-responsive">
         <table class="table">
@@ -38,6 +41,7 @@
                         </span>
                     </td>
                     <td>
+                        <a href="/employee/{{ employee.id }}/" class="btn btn-sm btn-secondary">
                             <i class="fas fa-eye"></i>
                         </a>
                     </td>
