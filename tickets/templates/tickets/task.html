@@ -6,7 +6,7 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">Заявка #{{ task.id }}</h2>
-        <div style="display: flex; gap: 0.5rem;">
+        <div>
             <a href="{% url 'edit_task' task.id %}" class="btn btn-primary">
                 <i class="fas fa-edit"></i> Редактировать
             </a>
@@ -16,91 +16,70 @@
         </div>
     </div>
 
-    <div style="padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+    <div class="task-content">
+        <div class="task-header">
             <div>
-                <h3 style="font-size: 1.5rem; color: var(--gray-900); margin-bottom: 0.5rem;">{{ task.title }}</h3>
-                <span class="badge badge-{{ task.status }}" style="font-size: 0.9rem;">
+                <h3>{{ task.title }}</h3>
+                <span class="badge badge-{{ task.status }}">
                     {{ task.get_status_display }}
                 </span>
             </div>
-            <div style="text-align: right;">
-                <div style="font-size: 0.875rem; color: var(--gray-500);">Создана</div>
-                <div style="font-weight: 500;">{{ task.created_at|date:"d.m.Y H:i" }}</div>
+            <div class="task-meta">
+                <div>Создана: {{ task.created_at|date:"d.m.Y H:i" }}</div>
             </div>
         </div>
 
-        <div style="margin-bottom: 2rem;">
-            <h4 style="font-size: 1.125rem; color: var(--gray-800); margin-bottom: 1rem;">Описание проблемы</h4>
-            <div style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
+        <div class="task-section">
+            <h4>Описание проблемы</h4>
+            <div class="task-description">
                 {{ task.problem|linebreaks }}
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-user"></i> Автор
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    {{ task.author.get_full_name|default:task.author.username }}
-                </p>
+        <div class="detail-grid">
+            <div class="detail-card">
+                <h5><i class="fas fa-user"></i> Автор</h5>
+                <p>{{ task.author.get_full_name|default:task.author.username }}</p>
             </div>
 
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-user-tie"></i> Исполнитель
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
+            <div class="detail-card">
+                <h5><i class="fas fa-user-tie"></i> Исполнитель</h5>
+                <p>
                     {% if task.worker %}
                         {{ task.worker.get_full_name|default:task.worker.username }}
                     {% else %}
-                        <span style="color: var(--gray-500); font-style: italic;">Не назначен</span>
+                        <span class="text-muted">Не назначен</span>
                     {% endif %}
                 </p>
             </div>
 
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-tag"></i> Категория
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    {{ task.category|default:"Не указана" }}
-                </p>
+            <div class="detail-card">
+                <h5><i class="fas fa-tag"></i> Категория</h5>
+                <p>{{ task.category|default:"Не указана" }}</p>
             </div>
 
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-building"></i> Офис
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    {{ task.office|default:"Не указан" }}
-                </p>
+            <div class="detail-card">
+                <h5><i class="fas fa-building"></i> Офис</h5>
+                <p>{{ task.office|default:"Не указан" }}</p>
             </div>
 
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-flag"></i> Приоритет
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    {{ task.get_priority_display|default:"Обычный" }}
-                </p>
+            <div class="detail-card">
+                <h5><i class="fas fa-flag"></i> Приоритет</h5>
+                <p>{{ task.get_priority_display|default:"Обычный" }}</p>
             </div>
         </div>
 
         {% if task.attachments.exists %}
-        <div style="margin-bottom: 2rem;">
-            <h4 style="font-size: 1.125rem; color: var(--gray-800); margin-bottom: 1rem;">Прикрепленные файлы</h4>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div class="task-section">
+            <h4>Прикрепленные файлы</h4>
+            <div class="attachments">
                 {% for attachment in task.attachments.all %}
-                <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--gray-50); border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                    <i class="fas fa-paperclip" style="color: var(--gray-500);"></i>
-                    <a href="{{ attachment.file.url }}" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 500; flex: 1;">
+                <div class="attachment">
+                    <i class="fas fa-paperclip"></i>
+                    <a href="{{ attachment.file.url }}" target="_blank">
                         {{ attachment.filename }}
                     </a>
-                    <span style="color: var(--gray-500); font-size: 0.875rem;">
-                        {{ attachment.file.size|filesizeformat }}
-                    </span>
+                    <span class="file-size">{{ attachment.file.size|filesizeformat }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -109,74 +88,54 @@
     </div>
 </div>
 
-<!-- Комментарии и обратная связь -->
+<!-- Фидбек/комментарии -->
 <div class="card" style="margin-top: 1.5rem;">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-comments"></i> Комментарии и история
+            <i class="fas fa-comments"></i> Обратная связь
         </h3>
     </div>
 
-    <div style="padding: 1.5rem;">
-        {% if task.comments.exists %}
-        <div style="margin-bottom: 2rem;">
-            {% for comment in task.comments.all %}
-            <div style="padding: 1.5rem; border: 1px solid var(--gray-200); border-radius: var(--border-radius); margin-bottom: 1rem; background: white;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--gray-100);">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
+    <div class="comments-container">
+        {% if comments %}
+        <div class="comments-list">
+            {% for comment in comments %}
+            <div class="comment">
+                <div class="comment-header">
+                    <div class="comment-author">
+                        <div class="avatar-small">
                             {{ comment.author.username|first|upper }}
                         </div>
                         <div>
                             <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
-                            <div style="color: var(--gray-500); font-size: 0.75rem; margin-top: 0.125rem;">
-                                {{ comment.created_at|date:"d.m.Y H:i" }}
-                            </div>
+                            <small>{{ comment.created_at|date:"d.m.Y H:i" }}</small>
                         </div>
                     </div>
-                    {% if comment.is_status_change %}
-                    <span style="background: var(--warning); color: #92400e; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 500;">
-                        <i class="fas fa-exchange-alt"></i> Изменен статус
-                    </span>
-                    {% endif %}
                 </div>
-                <div style="line-height: 1.7; color: var(--gray-800);">
+                <div class="comment-body">
                     {{ comment.text|linebreaks }}
                 </div>
-                {% if comment.attachments.exists %}
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100); display: flex; flex-wrap: wrap; gap: 0.75rem;">
-                    {% for file in comment.attachments.all %}
-                    <a href="{{ file.file.url }}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: var(--gray-100); border-radius: var(--border-radius); color: var(--gray-700); text-decoration: none; font-size: 0.875rem;" target="_blank">
-                        <i class="fas fa-paperclip"></i> {{ file.filename }}
-                    </a>
-                    {% endfor %}
-                </div>
-                {% endif %}
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
-            <i class="fas fa-comment-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <div class="empty-state">
+            <i class="fas fa-comment-slash"></i>
             <p>Пока нет комментариев</p>
         </div>
         {% endif %}
 
-        <!-- Форма добавления комментария -->
-        <div style="padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-            <h4 style="margin-bottom: 1rem; color: var(--gray-800);">Добавить комментарий</h4>
-            <form method="POST" action="{% url 'add_comment' task.id %}" enctype="multipart/form-data">
+        <!-- Форма для фидбека -->
+        <div class="add-comment">
+            <h4>Добавить комментарий</h4>
+            <form method="POST" action="{% url 'feedback' task.id %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
                     <textarea name="text" class="form-control" placeholder="Введите ваш комментарий..." rows="3" required></textarea>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Прикрепить файлы</label>
-                    <input type="file" name="attachments" multiple class="form-control">
-                </div>
-                <div style="margin-top: 1rem;">
+                <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> Отправить комментарий
+                        <i class="fas fa-paper-plane"></i> Отправить
                     </button>
                 </div>
             </form>

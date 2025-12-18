@@ -6,8 +6,8 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">Редактировать заявку #{{ task.id }}</h2>
-        <div style="display: flex; gap: 0.5rem;">
-            <a href="{% url 'task' task.id %}" class="btn btn-secondary">
+        <div>
+            <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">
                 <i class="fas fa-eye"></i> Просмотр
             </a>
             <a href="{% url 'tasks' %}" class="btn btn-secondary">
@@ -41,8 +41,8 @@
                 <textarea name="problem" class="form-control" rows="5" required>{{ task.problem }}</textarea>
             </div>
 
-            <div style="display: flex; gap: 1rem;">
-                <div class="form-group" style="flex: 1;">
+            <div class="form-row">
+                <div class="form-group">
                     <label class="form-label">Приоритет</label>
                     <select name="priority" class="form-control">
                         <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Низкий</option>
@@ -52,7 +52,7 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group">
                     <label class="form-label">Категория</label>
                     <select name="category" class="form-control">
                         <option value="" {% if not task.category %}selected{% endif %}>Не выбрано</option>
@@ -64,8 +64,8 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem;">
-                <div class="form-group" style="flex: 1;">
+            <div class="form-row">
+                <div class="form-group">
                     <label class="form-label">Офис</label>
                     <select name="office" class="form-control">
                         <option value="" {% if not task.office %}selected{% endif %}>Не выбрано</option>
@@ -75,7 +75,7 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group">
                     <label class="form-label">Исполнитель</label>
                     <select name="worker" class="form-control">
                         <option value="">Не назначен</option>
@@ -88,11 +88,11 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+            <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Сохранить изменения
                 </button>
-                <a href="{% url 'task' task.id %}" class="btn btn-secondary">
+                <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Отмена
                 </a>
             </div>

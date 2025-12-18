@@ -17,3 +17,4 @@ urlpatterns = [
     path('send-email/', views.send_message, name='send_email'),
     path('tasks/<int:task_id>/feedback/', views.feedback, name='feedback'),
 ]
+
