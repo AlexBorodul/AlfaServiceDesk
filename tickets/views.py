@@ -9,7 +9,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from tickets.models import Task, CategoryType, Employee
+from tickets.models import Task, CategoryType, Employee, User
 from tickets.forms import TaskForm, SendEmailForm, FeedbackForm
 
 
@@ -23,8 +23,9 @@ def login_view(request):
             messages.success(request, f'Добро пожаловать, {user.username}!')
             try:
                 access_token = AccessToken.for_user(user)
-                access_token.payload = {"id": 1}
-                request.session['access_token'] = 2
+                print(Employee.objects.filter(email = user.email).first().id)
+                request.session['access_token'] = Employee.objects.filter(email = user.email).first().id
+                print(request.session['access_token'])
             except TokenError:
                 messages.error(request, 'Failed to receive tokens')
             return redirect('tasks')
@@ -45,9 +46,10 @@ def logout_view(request):
 @permission_classes([IsAuthenticated])
 @login_required
 def all_tasks(request):
-    """Список всех заявок пользователя"""
     print(request.session['access_token'])
+    """Список всех заявок пользователя"""
     tasks = Task.objects.filter(author__id=request.session['access_token']).order_by('-created_at')
+    print(tasks)
     return render(request, 'tickets/tasks.html', {"tasks": tasks})
 
 @permission_classes([IsAuthenticated])
@@ -74,6 +76,7 @@ def create_task(request):
             messages.success(request, 'Заявка успешно создана!')
             return redirect('tasks')
     else:
+        print('ГОВНО')
         form = TaskForm()
 
     # Получаем категории для выпадающего списка

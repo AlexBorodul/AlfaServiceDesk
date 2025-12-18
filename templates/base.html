@@ -13,22 +13,25 @@
     {% if user.is_authenticated %}
     <div class="app-container">
         {% include 'includes/header.html' %}
-        {% include 'includes/sidebar.html' %}
 
-        <main class="main-content">
-            {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                    <button class="close-alert">&times;</button>
+        <div class="content-wrapper">
+            {% include 'includes/sidebar.html' %}
+
+            <main class="main-content">
+                {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                        <button class="close-alert">&times;</button>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+                {% endif %}
 
-            {% block content %}{% endblock %}
-        </main>
+                {% block content %}{% endblock %}
+            </main>
+        </div>
 
         {% include 'includes/footer.html' %}
     </div>

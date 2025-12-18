@@ -9,7 +9,7 @@ class TaskForm(ModelForm):
     files = forms.FileField(required = None)
     class Meta:
         model = Task
-        fields = ["status", "problem", "priority", "title", "category"] 
+        fields = ["problem", "priority", "title", "category"] 
 
 
 class SendEmailForm(forms.Form):
