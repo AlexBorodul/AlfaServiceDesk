@@ -40,7 +40,7 @@ class Employee(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='employee')
     specialization = models.ManyToManyField(CategoryType, blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
-    status = models.CharField(choices = STATUS_CHOICES, null = True, blank = True)
+    status = models.CharField(choices = STATUS_CHOICES, null = True, blank = True, max_length=20)
 
     def __str__(self):
         return f"{self.first_name} {self.surname or ''}"
