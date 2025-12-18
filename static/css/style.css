@@ -1310,3 +1310,129 @@ textarea.form-control {
     color: var(--primary-color);
     text-decoration: underline;
 }
+
+/* Исправление для статуса "На доработку" (rework) */
+select[name="status"] {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: var(--gray-800);
+    background: white;
+}
+
+select[name="status"] option {
+    padding: 0.5rem;
+}
+
+/* Стиль для текстовой области с описанием проблемы */
+textarea[name="problem"] {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--gray-800);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    background: white;
+    padding: 0.75rem;
+    transition: all 0.2s;
+}
+
+textarea[name="problem"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+}
+
+textarea[name="problem"]::placeholder {
+    color: var(--gray-400);
+}
+
+/* Стиль для обязательных полей */
+.form-label[for*="required"]::after,
+.form-label:has(+ textarea[required])::after {
+    content: " *";
+    color: var(--danger);
+}
+
+/* Стиль для метки "Crazy" (вероятно, должна быть "Статус") */
+.form-label:has(+ select[name="status"]) {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+/* Исправление отображения текста из шаблона */
+.form-group select option:checked {
+    font-weight: 500;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Стили для ошибок шаблонизатора */
+textarea[name="problem"]:empty::before {
+    content: attr(placeholder);
+    color: var(--gray-400);
+}
+
+/* Подсказка для текстовой области */
+.form-text {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+/* Дополнительные стили для статусов */
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.waiting { background-color: #f59e0b; }
+.status-dot.in_progress { background-color: #3b82f6; }
+.status-dot.done { background-color: #10b981; }
+.status-dot.rework { background-color: #ec4899; }
+.status-dot.rejected { background-color: #ef4444; }
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    select[name="status"] {
+        font-size: 1rem; /* Увеличиваем для мобильных */
+    }
+    
+    textarea[name="problem"] {
+        min-height: 150px; /* Увеличиваем минимальную высоту */
+        font-size: 1rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+    }
+}
+
+/* Стили для индикации загрузки/сохранения */
+.form-group.saving select,
+.form-group.saving textarea {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Валидация */
+textarea[name="problem"]:invalid,
+select[name="status"]:invalid {
+    border-color: var(--danger);
+}
+
+textarea[name="problem"]:invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
