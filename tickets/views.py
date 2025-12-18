@@ -23,8 +23,8 @@ def login_view(request):
             messages.success(request, f'Добро пожаловать, {user.username}!')
             try:
                 access_token = AccessToken.for_user(user)
-                access_token.payload = {"id": user.id}
-                request.session['access_token'] = access_token
+                access_token.payload = {"id": 1}
+                request.session['access_token'] = 2
             except TokenError:
                 messages.error(request, 'Failed to receive tokens')
             return redirect('tasks')
@@ -46,7 +46,8 @@ def logout_view(request):
 @login_required
 def all_tasks(request):
     """Список всех заявок пользователя"""
-    tasks = Task.objects.filter(author__email=request.user.email).order_by('-created_at')
+    print(request.session['access_token'])
+    tasks = Task.objects.filter(author__id=request.session['access_token']).order_by('-created_at')
     return render(request, 'tickets/tasks.html', {"tasks": tasks})
 
 @permission_classes([IsAuthenticated])
