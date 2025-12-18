@@ -59,7 +59,9 @@ def create_task(request):
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
-            task = form.save()
+            task = form.save(commit=False)
+            task.author = Employee.objects.get(pk = request.session['access_token'])
+            task.save() 
             return redirect("task_detail", task_id=task.id)
     else:
         form = TaskForm(
