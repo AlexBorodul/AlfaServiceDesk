@@ -56,36 +56,29 @@ def all_tasks(request):
 @login_required
 def create_task(request):
     """Создание новой заявки"""
-    if request.method == 'POST':
-        form = TaskForm(request.POST, request.FILES)
+    if request.method == "POST":
+        form = TaskForm(request.POST)
         if form.is_valid():
-            task = form.save(commit=False)
-            # Назначаем автором текущего пользователя
-            from tickets.models import Employee
-            try:
-                employee = Employee.objects.get(email=request.user.email)
-            except Employee.DoesNotExist:
-                # Создаем временного сотрудника
-                employee = Employee.objects.create(
-                    email=request.user.email,
-                    first_name=request.user.username,
-                    role='employee'
-                )
-            task.author = employee
-            task.save()
-            messages.success(request, 'Заявка успешно создана!')
-            return redirect('tasks')
+            task = form.save()
+            return redirect("task_detail", task_id=task.id)
     else:
-        print('ГОВНО')
-        form = TaskForm()
+        form = TaskForm(
+            initial={
+                "author": request.user # если есть связь user → employee
+            }
+        )
 
-    # Получаем категории для выпадающего списка
-    categories = CategoryType.objects.all()
-    return render(request, 'tickets/create_task.html', {
+    return render(request, "tickets/create_task.html", {
         "form": form,
-        "categories": categories,
-        "status_choices": Task.STATUS_CHOICES
     })
+
+    # # Получаем категории для выпадающего списка
+    # categories = CategoryType.objects.all()
+    # return render(request, 'tickets/create_task.html', {
+    #     "form": form,
+    #     "categories": categories,
+    #     "status_choices": Task.STATUS_CHOICES
+    # })
 
 @permission_classes([IsAuthenticated])
 @login_required

@@ -5,89 +5,19 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title">Создать новую заявку</h2>
-        <a href="{% url 'tasks' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Назад
-        </a>
+        <h2 class="card-title">Создать заявку</h2>
+        <a href="{% url 'tasks' %}" class="btn btn-secondary">Назад</a>
     </div>
 
     <div class="card-body">
-        <form method="POST" enctype="multipart/form-data">
+        <form method="post">
             {% csrf_token %}
 
-            <div class="form-group">
-                <label class="form-label">Заголовок *</label>
-                <input type="text" name="title" class="form-control" required
-                       placeholder="Краткое описание проблемы">
-            </div>
+            {{ form.as_p }}
 
-            <div class="form-group">
-                <label class="form-label">Категория</label>
-                <select name="category" class="form-control">
-                    <option value="">Выберите категорию</option>
-                    <option value="it">IT проблема</option>
-                    <option value="office">Офисное оборудование</option>
-                    <option value="hr">Кадровый вопрос</option>
-                    <option value="other">Другое</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Описание проблемы *</label>
-                <textarea name="problem" class="form-control" rows="5" required
-                          placeholder="Подробно опишите проблему..."></textarea>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Приоритет</label>
-                    <select name="priority" class="form-control">
-                        <option value="low">Низкий</option>
-                        <option value="medium" selected>Средний</option>
-                        <option value="high">Высокий</option>
-                        <option value="critical">Критический</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Офис</label>
-                    <select name="office" class="form-control">
-                        <option value="">Выберите офис</option>
-                        <option value="main">Главный офис</option>
-                        <option value="branch1">Филиал 1</option>
-                        <option value="branch2">Филиал 2</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Исполнитель</label>
-                <select name="worker" class="form-control">
-                    <option value="">Не назначен</option>
-                    {% for employee in employees %}
-                    <option value="{{ employee.id }}">
-                        {{ employee.first_name }} {{ employee.second_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Прикрепить файлы</label>
-                <input type="file" name="attachments" multiple class="form-control">
-                <small style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.25rem;">
-                    Можно прикрепить несколько файлов
-                </small>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-check"></i> Создать заявку
-                </button>
-                <button type="reset" class="btn btn-secondary">
-                    <i class="fas fa-redo"></i> Сбросить
-                </button>
-            </div>
+            <button type="submit" class="btn btn-primary">
+                Создать
+            </button>
         </form>
     </div>
 </div>

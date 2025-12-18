@@ -9,7 +9,7 @@ class TaskForm(forms.ModelForm):
     files = forms.FileField(required = None)
     class Meta:
         model = Task
-        exclude = ("author", "actual_cost")
+        exclude = ("actual_cost",)
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
