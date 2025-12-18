@@ -1,5 +1,6 @@
 from django.db import migrations
 from tickets.factories import EmployeeFactory, OfficeFactory, CategoryTypeFactory, TaskFactory
+import random
 
 def fill_data(apps, schema_editor):
     for _ in range(5):
@@ -8,6 +9,8 @@ def fill_data(apps, schema_editor):
             employee = EmployeeFactory.create(office = office)
             worker = EmployeeFactory.create(office = office)
             worker.specialization.set([CategoryTypeFactory()])
+            worker.status = random.choice(['FREE', "BUSY"])
+            worker.save()
             for _ in range(2):
                 task = TaskFactory.create(author = employee, worker = worker, office = office)
 class Migration(migrations.Migration):
