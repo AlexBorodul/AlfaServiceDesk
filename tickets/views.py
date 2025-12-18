@@ -143,3 +143,9 @@ def feedback(request, task_id):
 def all_users(request):
     users = Employee.objects.all()
     return render(request, 'tickets/employees.html', {'employees': users})
+
+
+@login_required
+def user_by_id(request, user_id):
+    users = Employee.objects.get(pk = user_id)
+    return render(request, 'tickets/employee.html', {'employee': users})
