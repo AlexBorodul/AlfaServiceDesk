@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "uvicorn",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -77,9 +78,13 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "service_desk.wsgi.application"
+ASGI_APPLICATION = "service_desk.asgi.application"
 
-
+CHANNELS_LAYERS = {
+    'default': {
+        "BACKEND": 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 #DATABASES = {
 #    'default': {
