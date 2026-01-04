@@ -9,8 +9,9 @@ django-celery-results
 boto3
 minio
 gunicorn
-uvicorn
+uvicorn[standard]
 pytest 
 pytest-django 
 factory-boy
 flower
+channels
