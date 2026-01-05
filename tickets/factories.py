@@ -1,6 +1,6 @@
 import factory
-from factory import SubFactory, faker
-from tickets.models import Employee, ActionType, CategoryType, Office, Action, Attachment, Task
+from factory import SubFactory
+from tickets.models import Employee, ActionType, CategoryType, Office, Task, User
 import random
 import decimal
 
@@ -27,6 +27,15 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     office = SubFactory('tickets.factories.OfficeFactory')
     role = random.choice(["role_1", "role_2", "role_3"])
     parent = None
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: f'user{n}')
+    email = factory.Sequence(lambda n: f'mail{n}@example.com')
+    password = factory.PostGenerationMethodCall('set_password', '123')
+    employee = factory.SubFactory(EmployeeFactory)
 
 class OfficeFactory(factory.django.DjangoModelFactory):
     class Meta:

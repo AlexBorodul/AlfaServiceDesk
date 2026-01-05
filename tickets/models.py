@@ -23,10 +23,8 @@ class CategoryType(models.Model):
 class Employee(models.Model):
     ROLE_CHOICES = [
         ('employee','Employee'),
-        ('specialist','Specialist'),
-        ('admin','Admin'),
-        ('supervisor','Supervisor'),
-        ('manager','Manager'),
+        ('worker','Worker'),
+        ('admin','Admin')
     ]
     first_name = models.CharField(max_length=30)
     second_name = models.CharField(max_length=30, blank=True)
@@ -113,7 +111,7 @@ class TimeLog(models.Model):
             return (self.end_time - self.start_time).total_seconds() / 3600.0
         return None
 class User(AbstractUser):
-    author_id = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    employee = models.OneToOneField('Employee', null=True, blank=True, on_delete=models.SET_NULL)
 
     groups = models.ManyToManyField(
         'auth.Group',
