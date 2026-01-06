@@ -40,8 +40,7 @@ class Migration(migrations.Migration):
                 ('second_name', models.CharField(blank=True, max_length=30)),
                 ('surname', models.CharField(blank=True, max_length=30)),
                 ('email', models.EmailField(max_length=254, unique=True)),
-                ('role', models.CharField(choices=[('employee', 'Employee'), ('worker', 'Worker'), ('admin', 'Admin')], default='employee', max_length=20)),
-                
+                ("status", models.CharField(choices = [("FREE", "free"), ("BUSY", "busy")], null = True, blank = True, max_length=20)),
             ],
         ),
         migrations.CreateModel(

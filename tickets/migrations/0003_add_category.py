@@ -9,7 +9,7 @@ def create_category_types(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tickets', '0003_add_employees'),
+        ('tickets', '0002_add_office'),
     ]
 
     operations = [

@@ -6,7 +6,8 @@ class WorkerController:
     @classmethod
     def auto_select_worker(cls, task: Task) -> Employee:
         """Автоматический выбор исполнителя."""
-        task.worker = Employee.objects.filter(status='FREE', specialization=task.category)
+        task.worker = Employee.objects.filter(status='FREE', specialization=task.category).first()
+        return task
     @classmethod
     def change_worker(self) -> Employee:
         """Смена исполнителя"""

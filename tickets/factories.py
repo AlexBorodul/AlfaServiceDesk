@@ -24,8 +24,6 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     second_name = factory.faker.Faker('last_name', locale = 'it_IT')
     surname = "Alekseevich"
     email = factory.Sequence(lambda n: f'employee{n}@example.com')
-    office = SubFactory('tickets.factories.OfficeFactory')
-    role = random.choice(["role_1", "role_2", "role_3"])
     parent = None
 
 class UserFactory(factory.django.DjangoModelFactory):

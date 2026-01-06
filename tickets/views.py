@@ -56,11 +56,10 @@ def create_task(request):
         if form.is_valid():
             task = form.save(commit=False)
             task.author = Employee.objects.get(pk = request.session['access_token'])
-            if task.worker:
-                task.save() 
-                return redirect("task_detail", task_id=task.id)
-            else:
-                WorkerController.auto_select_worker()
+            if not task.worker:
+                WorkerController.auto_select_worker(task)
+            task.save() 
+            return redirect("task_detail", task_id=task.id)
     else:
         form = TaskForm()
 

@@ -39,9 +39,9 @@ class Employee(models.Model):
     surname = models.CharField(max_length=30, blank=True)
     email = models.EmailField(unique=True)
     office = models.ForeignKey(Office, null=True, blank=True, on_delete=models.SET_NULL)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='employee')
-    specialization = models.ManyToManyField(CategoryType, blank=True)
+    specialization = models.ManyToManyField(CategoryType, blank=True, null=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    status = models.CharField(choices = [("FREE", "free"), ("BUSY", "busy")], null = True, blank = True, max_length=20)
 
     def __str__(self):
         return f"{self.first_name} {self.surname or ''}"
