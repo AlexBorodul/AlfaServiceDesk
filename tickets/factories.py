@@ -17,14 +17,17 @@ class CategoryTypeFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: f"category {n}")
     description = factory.Sequence(lambda n: f"Description for action {n}")
 
+
 class EmployeeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Employee
-    first_name = factory.faker.Faker('first_name', locale = 'it_IT')
-    second_name = factory.faker.Faker('last_name', locale = 'it_IT')
+
+    first_name = factory.faker.Faker('first_name', locale='it_IT')
+    second_name = factory.faker.Faker('last_name', locale='it_IT')
     surname = "Alekseevich"
     email = factory.Sequence(lambda n: f'employee{n}@example.com')
     parent = None
+    role = 'employee'
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:

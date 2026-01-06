@@ -1,43 +1,59 @@
 {% extends 'base.html' %}
 
-{% block auth_content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-logo">
-            <i class="fas fa-headset fa-3x" style="color: #1a56db;"></i>
-            <h2 style="margin-top: 1rem;">Alfa Service Desk</h2>
-        </div>
-        
-        <h2 class="auth-title">Вход в систему</h2>
-        
-        {% if form.errors %}
-        <div class="alert alert-error">
-            Неверное имя пользователя или пароль.
-        </div>
-        {% endif %}
-        
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label class="form-label">Имя пользователя</label>
-                <input type="text" name="username" class="form-control" required autofocus>
+{% block title %}Вход в систему{% endblock %}
+
+{% block page_title %}Вход в Service Desk{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Авторизация</h4>
             </div>
-            
-            <div class="form-group">
-                <label class="form-label">Пароль</label>
-                <input type="password" name="password" class="form-control" required>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        Неверное имя пользователя или пароль.
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            <i class="fas fa-user"></i> Имя пользователя
+                        </label>
+                        <input type="text" name="username" class="form-control"
+                               id="id_username" required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">
+                            <i class="fas fa-lock"></i> Пароль
+                        </label>
+                        <input type="password" name="password" class="form-control"
+                               id="id_password" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <div class="text-center">
+                    <p class="text-muted">
+                        <small>
+                            Для доступа к системе обратитесь к администратору
+                        </small>
+                    </p>
+                </div>
             </div>
-            
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
-                <i class="fas fa-sign-in-alt"></i> Войти
-            </button>
-            
-            <input type="hidden" name="next" value="{{ next }}">
-        </form>
-        
-        <div style="text-align: center; margin-top: 1.5rem; color: var(--gray-500); font-size: 0.9rem;">
-            Корпоративная система управления заявками
         </div>
     </div>
 </div>

@@ -1,41 +1,99 @@
+# tickets/migrations/0004_add_employees.py (исправленная версия)
+
 from django.db import migrations
-from tickets.models import Office, CategoryType
 from tickets.factories import UserFactory, EmployeeFactory
 from django.contrib.auth.models import Group
-from tickets.groups import create_group
 
 
 def create_employees(apps, schema_editor):
-    author_group = Group.objects.get(name='Author')
-    worker_group = Group.objects.get(name='Worker')
+    # Используем apps.get_model для безопасного получения моделей
+    Group = apps.get_model('auth', 'Group')
+    Office = apps.get_model('tickets', 'Office')
+    CategoryType = apps.get_model('tickets', 'CategoryType')
+    Employee = apps.get_model('tickets', 'Employee')
+    User = apps.get_model('tickets', 'User')
+
+    try:
+        author_group = Group.objects.get(name='Author')
+        worker_group = Group.objects.get(name='Worker')
+    except Group.DoesNotExist:
+        print("Группы еще не созданы. Пропускаем создание сотрудников.")
+        return
+
     offices = Office.objects.all()
     category_types = CategoryType.objects.all()
+
     for office in offices:
-        main_worker = EmployeeFactory.create(office = office)
+        # Создаем главного исполнителя
+        main_worker = Employee.objects.create(
+            first_name="Главный",
+            second_name="Исполнитель",
+            surname="Офиса",
+            email=f"main_worker_{office.id}@example.com",
+            office=office,
+            status="FREE",
+            role="worker"
+        )
         main_worker.specialization.set(category_types)
-        main_worker.status = "FREE"
-        main_worker.save()
         office.main_worker = main_worker
-        main_worker_user = UserFactory.create(employee=main_worker)
+        office.save()
+
+        # Создаем пользователя для главного исполнителя
+        main_worker_user = User.objects.create_user(
+            username=f"main_worker_{office.id}",
+            email=f"main_worker_{office.id}@example.com",
+            password="123",
+            employee=main_worker
+        )
         main_worker_user.groups.add(author_group, worker_group)
-        for _ in range(3):
-            worker = EmployeeFactory.create(office=office, parent = main_worker)
-            worker.status = "FREE"
+
+        # Создаем обычных исполнителей
+        for i in range(3):
+            worker = Employee.objects.create(
+                first_name=f"Исполнитель_{i + 1}",
+                second_name="Офиса",
+                surname=f"{office.id}",
+                email=f"worker_{office.id}_{i}@example.com",
+                office=office,
+                parent=main_worker,
+                status="FREE",
+                role="worker"
+            )
+            # Добавляем специализации (случайные 2 категории)
             worker.specialization.set(category_types.order_by('?')[:2])
-            worker.save()
-            worker_user = UserFactory.create(employee=worker)
+
+            worker_user = User.objects.create_user(
+                username=f"worker_{office.id}_{i}",
+                email=f"worker_{office.id}_{i}@example.com",
+                password="123",
+                employee=worker
+            )
             worker_user.groups.add(author_group, worker_group)
-        for _ in range(10):
-            employee = EmployeeFactory.create(office=office)
-            user = UserFactory.create(employee=employee)
+
+        # Создаем обычных сотрудников
+        for i in range(10):
+            employee = Employee.objects.create(
+                first_name=f"Сотрудник_{i + 1}",
+                second_name="Офиса",
+                surname=f"{office.id}",
+                email=f"employee_{office.id}_{i}@example.com",
+                office=office,
+                role="employee"
+            )
+
+            user = User.objects.create_user(
+                username=f"employee_{office.id}_{i}",
+                email=f"employee_{office.id}_{i}@example.com",
+                password="123",
+                employee=employee
+            )
             user.groups.add(author_group)
-        
+
 
 class Migration(migrations.Migration):
     dependencies = [
         ('tickets', '0003_add_category'),
     ]
     operations = [
-        migrations.RunPython(create_group),
         migrations.RunPython(create_employees),
     ]

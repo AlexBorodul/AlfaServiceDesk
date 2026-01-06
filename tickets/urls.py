@@ -1,10 +1,14 @@
 from django.urls import path
 from . import views
 
+app_name = 'tickets'
+
 urlpatterns = [
-    # Главная страница и заявки
-    path('', views.all_tasks, name='tasks'),  # главная страница
-    path('tasks/', views.all_tasks, name='tasks'),  # дублирующий маршрут для уверенности
+    # Главная страница
+    path('', views.all_tasks, name='tasks'),
+
+    # Заявки
+    path('tasks/', views.all_tasks, name='tasks'),
     path('tasks/create/', views.create_task, name='create_task'),
     path('tasks/<int:task_id>/', views.get_task, name='task_detail'),
     path('tasks/<int:task_id>/edit/', views.edit_task, name='edit_task'),
@@ -16,7 +20,8 @@ urlpatterns = [
     # Email и фидбек
     path('send-email/', views.send_message, name='send_email'),
     path('tasks/<int:task_id>/feedback/', views.feedback, name='feedback'),
-    path('employees', views.all_users, name='users'),
-    path('employees/<int:user_id>', views.user_by_id, name='user')
-]
 
+    # Сотрудники
+    path('employees/', views.all_users, name='employees'),
+    path('employees/<int:user_id>/', views.user_by_id, name='employee_detail'),
+]

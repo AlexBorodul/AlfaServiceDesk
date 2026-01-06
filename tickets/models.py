@@ -30,9 +30,9 @@ class CategoryType(models.Model):
 
 class Employee(models.Model):
     ROLE_CHOICES = [
-        ('employee','Employee'),
-        ('worker','Worker'),
-        ('admin','Admin')
+        ('employee', 'Сотрудник'),
+        ('worker', 'Исполнитель'),
+        ('admin', 'Администратор'),
     ]
     first_name = models.CharField(max_length=30)
     second_name = models.CharField(max_length=30, blank=True)
@@ -42,6 +42,13 @@ class Employee(models.Model):
     specialization = models.ManyToManyField(CategoryType, blank=True, null=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     status = models.CharField(choices = [("FREE", "free"), ("BUSY", "busy")], null = True, blank = True, max_length=20)
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='employee',
+        verbose_name="Роль"
+    )
 
     def __str__(self):
         return f"{self.first_name} {self.surname or ''}"
