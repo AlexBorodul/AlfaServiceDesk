@@ -14,7 +14,15 @@ class Office(models.Model):
         return self.name
 
 class CategoryType(models.Model):
-    name = models.CharField(max_length=100)
+    CATEGORY_CHOICES = [
+        ('access/security','Проблемы с доступом и безопасностью'),
+        ('software','Проблемы с программным обеспечением'),
+        ('reports, statements, documents','Проблемы с отчётами, выписками, документами'),
+        ('hardware', 'Проблемы с оборудованием'),
+        ('communications/connection', 'Проблемы с коммуникациями и связью'),
+        ('service requests', 'Запросы на предоставление услуг')
+    ]
+    name = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -23,19 +31,17 @@ class CategoryType(models.Model):
 class Employee(models.Model):
     ROLE_CHOICES = [
         ('employee','Employee'),
-        ('specialist','Specialist'),
-        ('admin','Admin'),
-        ('supervisor','Supervisor'),
-        ('manager','Manager'),
+        ('worker','Worker'),
+        ('admin','Admin')
     ]
     first_name = models.CharField(max_length=30)
     second_name = models.CharField(max_length=30, blank=True)
     surname = models.CharField(max_length=30, blank=True)
     email = models.EmailField(unique=True)
     office = models.ForeignKey(Office, null=True, blank=True, on_delete=models.SET_NULL)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='employee')
-    specialization = models.ManyToManyField(CategoryType, blank=True)
+    specialization = models.ManyToManyField(CategoryType, blank=True, null=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    status = models.CharField(choices = [("FREE", "free"), ("BUSY", "busy")], null = True, blank = True, max_length=20)
 
     def __str__(self):
         return f"{self.first_name} {self.surname or ''}"
@@ -113,7 +119,7 @@ class TimeLog(models.Model):
             return (self.end_time - self.start_time).total_seconds() / 3600.0
         return None
 class User(AbstractUser):
-    author_id = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    employee = models.OneToOneField('Employee', null=True, blank=True, on_delete=models.SET_NULL)
 
     groups = models.ManyToManyField(
         'auth.Group',
