@@ -16,7 +16,7 @@ class Office(models.Model):
 class CategoryType(models.Model):
     CATEGORY_CHOICES = [
         ('access/security','Проблемы с доступом и безопасностью'),
-        ('software','Проблемы программным обеспечением'),
+        ('software','Проблемы с программным обеспечением'),
         ('reports, statements, documents','Проблемы с отчётами, выписками, документами'),
         ('hardware', 'Проблемы с оборудованием'),
         ('communications/connection', 'Проблемы с коммуникациями и связью'),

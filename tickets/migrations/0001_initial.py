@@ -41,6 +41,7 @@ class Migration(migrations.Migration):
                 ('surname', models.CharField(blank=True, max_length=30)),
                 ('email', models.EmailField(max_length=254, unique=True)),
                 ('role', models.CharField(choices=[('employee', 'Employee'), ('worker', 'Worker'), ('admin', 'Admin')], default='employee', max_length=20)),
+                
             ],
         ),
         migrations.CreateModel(

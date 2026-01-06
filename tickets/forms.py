@@ -6,7 +6,7 @@ from tickets.models import Task
 EMAIL_ADDRESS_MAX_LENGTH = 256
 
 class TaskForm(forms.ModelForm):
-    files = forms.FileField(required = None)
+    files = forms.FileField(required = False)
     class Meta:
         model = Task
         exclude = ("actual_cost", "author")

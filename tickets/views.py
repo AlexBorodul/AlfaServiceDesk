@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
-
+from tickets.workerController import WorkerController
 from tickets.models import Task, CategoryType, Employee, User
 from tickets.forms import TaskForm, SendEmailForm, FeedbackForm
 
@@ -19,13 +19,11 @@ def login_view(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            print(user, user.email)
             auth_login(request, user)
             messages.success(request, f'Добро пожаловать, {user.username}!')
             try:
                 access_token = AccessToken.for_user(user)
-                print(Employee.objects.filter(email = user.email).first())
-                request.session['access_token'] = Employee.objects.filter(email = user.email).first()
+                request.session['access_token'] = user.employee.id
             except TokenError:
                 messages.error(request, 'Failed to receive tokens')
             return redirect('tasks')
@@ -40,16 +38,13 @@ def login_view(request):
 def logout_view(request):
     """Выход из системы"""
     auth_logout(request)
-    messages.info(request, 'Вы успешно вышли из системы.')
     return redirect('login')
 
 @permission_classes([IsAuthenticated])
 @login_required
 def all_tasks(request):
-    print(request.session['access_token'])
     """Список всех заявок пользователя"""
     tasks = Task.objects.filter(author__id=request.session['access_token']).order_by('-created_at')
-    print(tasks)
     return render(request, 'tickets/tasks.html', {"tasks": tasks})
 
 @permission_classes([IsAuthenticated])
@@ -61,26 +56,17 @@ def create_task(request):
         if form.is_valid():
             task = form.save(commit=False)
             task.author = Employee.objects.get(pk = request.session['access_token'])
-            task.save() 
-            return redirect("task_detail", task_id=task.id)
+            if task.worker:
+                task.save() 
+                return redirect("task_detail", task_id=task.id)
+            else:
+                WorkerController.auto_select_worker()
     else:
-        form = TaskForm(
-            initial={
-                "author": request.user # если есть связь user → employee
-            }
-        )
+        form = TaskForm()
 
     return render(request, "tickets/create_task.html", {
         "form": form,
     })
-
-    # # Получаем категории для выпадающего списка
-    # categories = CategoryType.objects.all()
-    # return render(request, 'tickets/create_task.html', {
-    #     "form": form,
-    #     "categories": categories,
-    #     "status_choices": Task.STATUS_CHOICES
-    # })
 
 @permission_classes([IsAuthenticated])
 @login_required
