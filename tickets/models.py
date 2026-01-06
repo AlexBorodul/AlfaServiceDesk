@@ -14,7 +14,15 @@ class Office(models.Model):
         return self.name
 
 class CategoryType(models.Model):
-    name = models.CharField(max_length=100)
+    CATEGORY_CHOICES = [
+        ('access/security','Проблемы с доступом и безопасностью'),
+        ('software','Проблемы программным обеспечением'),
+        ('reports, statements, documents','Проблемы с отчётами, выписками, документами'),
+        ('hardware', 'Проблемы с оборудованием'),
+        ('communications/connection', 'Проблемы с коммуникациями и связью'),
+        ('service requests', 'Запросы на предоставление услуг')
+    ]
+    name = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     description = models.TextField(blank=True)
 
     def __str__(self):

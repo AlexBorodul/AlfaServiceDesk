@@ -19,13 +19,13 @@ def login_view(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
+            print(user, user.email)
             auth_login(request, user)
             messages.success(request, f'Добро пожаловать, {user.username}!')
             try:
                 access_token = AccessToken.for_user(user)
-                print(Employee.objects.filter(email = user.email).first().id)
-                request.session['access_token'] = Employee.objects.filter(email = user.email).first().id
-                print(request.session['access_token'])
+                print(Employee.objects.filter(email = user.email).first())
+                request.session['access_token'] = Employee.objects.filter(email = user.email).first()
             except TokenError:
                 messages.error(request, 'Failed to receive tokens')
             return redirect('tasks')

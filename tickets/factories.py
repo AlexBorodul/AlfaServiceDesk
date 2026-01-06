@@ -35,7 +35,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: f'user{n}')
     email = factory.Sequence(lambda n: f'mail{n}@example.com')
     password = factory.PostGenerationMethodCall('set_password', '123')
-    employee = factory.SubFactory(EmployeeFactory)
 
 class OfficeFactory(factory.django.DjangoModelFactory):
     class Meta:
