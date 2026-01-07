@@ -29,6 +29,8 @@ def create_employees(apps, schema_editor):
             employee = EmployeeFactory.create(office=office)
             user = UserFactory.create(employee=employee)
             user.groups.add(author_group)
+    for group in Group.objects.all():
+        print(group, group.permissions)
         
 
 class Migration(migrations.Migration):

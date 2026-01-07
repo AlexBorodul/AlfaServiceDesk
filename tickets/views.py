@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.http import Http404
 from rest_framework_simplejwt.tokens import AccessToken
@@ -44,8 +45,16 @@ def logout_view(request):
 @login_required
 def all_tasks(request):
     """Список всех заявок пользователя"""
-    tasks = Task.objects.filter(author__id=request.session['access_token']).order_by('-created_at')
-    return render(request, 'tickets/tasks.html', {"tasks": tasks})
+    groups_count = request.user.groups.count()
+    tasks = Task.objects.filter(author__id=request.session['access_token']).order_by('-created_at')   
+    return render(request, 'tickets/tasks.html', {"tasks": tasks, "groups_count": groups_count})
+
+@permission_classes([IsAuthenticated])
+@login_required
+def all_tasks_workers(request):
+    """Список всех заявок пользователя"""
+    tasks = Task.objects.filter(worker__id=request.session['access_token']).order_by('-created_at')   
+    return render(request, 'tickets/tasks.html', {"tasks": tasks, "groups_count": 2})
 
 @permission_classes([IsAuthenticated])
 @login_required
