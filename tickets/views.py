@@ -29,7 +29,7 @@ def get_current_employee(request):
 def login_view(request):
     """Авторизация - исправленная версия"""
     if request.user.is_authenticated:
-        return redirect('tasks')
+        return redirect('tickets:tasks')
 
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -38,17 +38,36 @@ def login_view(request):
             auth_login(request, user)
             messages.success(request, f'Добро пожаловать, {user.username}!')
 
-            # Получаем связанного сотрудника
+            # Проверяем, есть ли Employee у пользователя
             try:
                 employee = user.employee
                 if employee:
                     # Сохраняем информацию о сотруднике в сессии
                     request.session['employee_id'] = employee.id
                     request.session['employee_name'] = f"{employee.first_name} {employee.second_name or ''}"
-            except:
-                pass
+                else:
+                    # Если Employee нет, создаем его автоматически
+                    employee = Employee.objects.create(
+                        first_name=user.first_name or user.username,
+                        second_name=user.last_name or "",
+                        email=user.email,
+                        role='employee'
+                    )
+                    user.employee = employee
+                    user.save()
 
-            return redirect('tasks')
+                    request.session['employee_id'] = employee.id
+                    request.session['employee_name'] = f"{employee.first_name} {employee.second_name or ''}"
+
+                    messages.info(request, f'Создан профиль сотрудника для {user.username}')
+            except Exception as e:
+                messages.warning(request, f'Не удалось создать профиль сотрудника: {str(e)}')
+
+            # Редирект
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('tickets:tasks')
         else:
             messages.error(request, 'Неверные учетные данные')
     else:
@@ -61,7 +80,7 @@ def logout_view(request):
     """Выход из системы"""
     auth_logout(request)
     messages.success(request, 'Вы успешно вышли из системы')
-    return redirect('login')
+    return redirect('tickets:login')
 
 
 @login_required
@@ -70,8 +89,12 @@ def create_task(request):
     current_employee = get_current_employee(request)
 
     if not current_employee:
-        messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
-        return redirect('tasks')
+        if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
+            messages.warning(request, "Для создания заявки необходимо привязать аккаунт к сотруднику. Обратитесь к администратору или создайте Employee запись.")
+            return redirect('tickets:tasks')
+        else:
+            messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
+            return redirect('tickets:tasks')
 
     if request.method == "POST":
         form = TaskForm(request.POST, request.FILES)
@@ -137,12 +160,18 @@ def all_tasks(request):
     """Список всех заявок пользователя"""
     current_employee = get_current_employee(request)
 
+    # Для суперпользователей и админов показываем все заявки, если нет Employee
     if not current_employee:
-        messages.error(request, "Ваш аккаунт не привязан к сотруднику. Обратитесь к администратору.")
-        return render(request, 'tickets/tasks.html', {'tasks': []})
-
-    # Получаем заявки пользователя
-    tasks = Task.objects.filter(author=current_employee).order_by('-created_at')
+        if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
+            # Админы могут видеть все заявки
+            tasks = Task.objects.all().order_by('-created_at')
+            messages.info(request, "Вы вошли как администратор. Отображаются все заявки.")
+        else:
+            messages.error(request, "Ваш аккаунт не привязан к сотруднику. Обратитесь к администратору.")
+            return render(request, 'tickets/tasks.html', {'tasks': [], 'current_employee': None})
+    else:
+        # Получаем заявки пользователя
+        tasks = Task.objects.filter(author=current_employee).order_by('-created_at')
 
     context = {
         'tasks': tasks,
@@ -159,16 +188,23 @@ def get_task(request, task_id):
     current_employee = get_current_employee(request)
 
     # Проверка доступа к заявке
+    is_admin = request.user.is_superuser or request.user.groups.filter(name='Admin').exists()
+    
+    # Админы могут видеть все заявки даже без Employee
     if not current_employee:
-        messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
-        return redirect('tasks')
-
-    if not (request.user.is_superuser or
-            request.user.groups.filter(name='Admin').exists() or
-            task.author == current_employee or
-            task.worker == current_employee):
-        messages.error(request, "У вас нет доступа к этой заявке.")
-        return redirect('tasks')
+        if is_admin:
+            # Админы могут просматривать любую заявку
+            pass
+        else:
+            messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
+            return redirect('tickets:tasks')
+    else:
+        # Для обычных пользователей проверяем права доступа
+        if not (is_admin or
+                task.author == current_employee or
+                task.worker == current_employee):
+            messages.error(request, "У вас нет доступа к этой заявке.")
+            return redirect('tickets:tasks')
 
     # Получаем связанные данные
     comments = Commentary.objects.filter(task=task).order_by('created_at')
@@ -177,33 +213,39 @@ def get_task(request, task_id):
 
     # Обработка добавления комментария
     if request.method == 'POST' and 'add_comment' in request.POST:
-        comment_text = request.POST.get('comment_text', '').strip()
-        if comment_text:
-            Commentary.objects.create(
-                task=task,
-                author=current_employee,
-                text=comment_text
-            )
-            messages.success(request, 'Комментарий добавлен')
-            return redirect('task_detail', task_id=task.id)
+        if not current_employee:
+            messages.warning(request, "Для добавления комментария необходимо привязать аккаунт к сотруднику.")
+        else:
+            comment_text = request.POST.get('comment_text', '').strip()
+            if comment_text:
+                Commentary.objects.create(
+                    task=task,
+                    author=current_employee,
+                    text=comment_text
+                )
+                messages.success(request, 'Комментарий добавлен')
+                return redirect('tickets:task_detail', task_id=task.id)
 
     # Обработка изменения статуса
     if request.method == 'POST' and 'change_status' in request.POST:
         if request.user.is_superuser or request.user.groups.filter(name__in=['Admin', 'Worker']).exists():
-            new_status = request.POST.get('status')
-            if new_status in dict(Task.STATUS_CHOICES):
-                old_status = task.status
-                task.status = new_status
-                task.save()
+            if not current_employee:
+                messages.warning(request, "Для изменения статуса необходимо привязать аккаунт к сотруднику.")
+            else:
+                new_status = request.POST.get('status')
+                if new_status in dict(Task.STATUS_CHOICES):
+                    old_status = task.status
+                    task.status = new_status
+                    task.save()
 
-                Action.objects.create(
-                    task=task,
-                    author=current_employee,
-                    description=f"Статус изменен: {old_status} → {new_status}"
-                )
+                    Action.objects.create(
+                        task=task,
+                        author=current_employee,
+                        description=f"Статус изменен: {old_status} → {new_status}"
+                    )
 
-                messages.success(request, f'Статус заявки изменен')
-                return redirect('task_detail', task_id=task.id)
+                    messages.success(request, f'Статус заявки изменен')
+                    return redirect('tickets:task_detail', task_id=task.id)
 
     context = {
         'task': task,
@@ -222,23 +264,40 @@ def get_task(request, task_id):
     return render(request, 'tickets/task.html', context)
 
 
+def dashboard(request):
+    """Дашборд системы"""
+    current_employee = get_current_employee(request)
+
+    if not current_employee:
+        messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
+        return redirect('tickets:login')
+
+    # Простая версия дашборда - перенаправление на заявки
+    return redirect('tickets:tasks')
+
+
 @login_required
 @permission_required('tickets.change_task', raise_exception=True)
 def edit_task(request, task_id):
     """Редактирование заявки"""
     task = get_object_or_404(Task, id=task_id)
     current_employee = get_current_employee(request)
+    is_admin = request.user.is_superuser or request.user.groups.filter(name='Admin').exists()
 
     if not current_employee:
-        messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
-        return redirect('tasks')
+        if is_admin:
+            messages.warning(request, "Для редактирования заявки необходимо привязать аккаунт к сотруднику.")
+            return redirect('tickets:task_detail', task_id=task.id)
+        else:
+            messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
+            return redirect('tickets:tasks')
 
     # Проверка прав на редактирование
     if not (request.user.is_superuser or
             request.user.groups.filter(name='Admin').exists() or
             task.author == current_employee):
         messages.error(request, "У вас нет прав для редактирования этой заявки.")
-        return redirect('task_detail', task_id=task.id)
+        return redirect('tickets:task_detail', task_id=task.id)
 
     if request.method == "POST":
         form = TaskForm(request.POST, request.FILES, instance=task)
@@ -262,7 +321,7 @@ def edit_task(request, task_id):
             )
 
             messages.success(request, f'Заявка #{task.id} обновлена!')
-            return redirect("task_detail", task_id=task.id)
+            return redirect("tickets:task_detail", task_id=task.id)
     else:
         form = TaskForm(instance=task)
 
@@ -283,7 +342,7 @@ def send_message(request):
     current_employee = get_current_employee(request)
 
     if not current_employee:
-        return redirect('tasks')
+        return redirect('tickets:tasks')
 
     if request.method == 'POST':
         form = SendEmailForm(request.POST, request.FILES)
@@ -292,7 +351,7 @@ def send_message(request):
             # Например, через Celery task или SMTP
 
             messages.success(request, 'Сообщение успешно отправлено!')
-            return redirect('tasks')
+            return redirect('tickets:tasks')
     else:
         form = SendEmailForm()
 
@@ -318,7 +377,7 @@ def feedback(request, task_id):
     # Проверяем, может ли пользователь оставлять фидбек
     if task.author != current_employee and not request.user.is_superuser:
         messages.error(request, "Вы можете оставлять отзыв только по своим заявкам.")
-        return redirect('task_detail', task_id=task.id)
+        return redirect('tickets:task_detail', task_id=task.id)
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
@@ -336,7 +395,7 @@ def feedback(request, task_id):
             )
 
             messages.success(request, 'Спасибо за вашу оценку!')
-            return redirect('task_detail', task_id=task.id)
+            return redirect('tickets:task_detail', task_id=task.id)
     else:
         form = FeedbackForm()
 
@@ -352,7 +411,7 @@ def all_users(request):
     """Список всех сотрудников"""
     if not request.user.is_superuser and not request.user.groups.filter(name='Admin').exists():
         messages.error(request, "У вас нет доступа к этой странице.")
-        return redirect('tasks')
+        return redirect('tickets:tasks')
 
     employees = Employee.objects.all().order_by('first_name', 'second_name')
 
@@ -367,7 +426,7 @@ def user_by_id(request, user_id):
     """Карточка сотрудника"""
     if not request.user.is_superuser and not request.user.groups.filter(name='Admin').exists():
         messages.error(request, "У вас нет доступа к этой странице.")
-        return redirect('tasks')
+        return redirect('tickets:tasks')
 
     employee = get_object_or_404(Employee, id=user_id)
 
@@ -392,7 +451,7 @@ def dashboard(request):
 
     if not current_employee:
         messages.error(request, "Ваш аккаунт не привязан к сотруднику.")
-        return redirect('login')
+        return redirect('tickets:login')
 
     # Статистика для разных ролей
     if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():

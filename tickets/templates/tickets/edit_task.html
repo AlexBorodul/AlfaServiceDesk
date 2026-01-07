@@ -6,13 +6,13 @@
 <div class="page-header">
     <div class="breadcrumb">
         <div class="breadcrumb-item">
-            <a href="{% url 'tasks' %}" class="breadcrumb-link">
+            <a href="{% url 'tickets:tasks' %}" class="breadcrumb-link">
                 <i class="fas fa-tasks"></i>
                 <span>Мои заявки</span>
             </a>
         </div>
         <div class="breadcrumb-item">
-            <a href="{% url 'task_detail' task.id %}" class="breadcrumb-link">
+            <a href="{% url 'tickets:task_detail' task.id %}" class="breadcrumb-link">
                 <i class="fas fa-eye"></i>
                 <span>Заявка #{{ task.id }}</span>
             </a>
@@ -45,11 +45,11 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">
+            <a href="{% url 'tickets:task_detail' task.id %}" class="btn btn-secondary">
                 <i class="fas fa-eye"></i>
                 Просмотр
             </a>
-            <a href="{% url 'tasks' %}" class="btn btn-secondary">
+            <a href="{% url 'tickets:tasks' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i>
                 Назад
             </a>
@@ -207,7 +207,7 @@
                         <i class="fas fa-save"></i>
                         Сохранить изменения
                     </button>
-                    <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">
+                    <a href="{% url 'tickets:task_detail' task.id %}" class="btn btn-secondary">
                         <i class="fas fa-times"></i>
                         Отменить
                     </a>

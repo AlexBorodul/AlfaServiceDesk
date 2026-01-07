@@ -39,7 +39,7 @@ class Employee(models.Model):
     surname = models.CharField(max_length=30, blank=True)
     email = models.EmailField(unique=True)
     office = models.ForeignKey(Office, null=True, blank=True, on_delete=models.SET_NULL)
-    specialization = models.ManyToManyField(CategoryType, blank=True, null=True)
+    specialization = models.ManyToManyField(CategoryType, blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     status = models.CharField(choices = [("FREE", "free"), ("BUSY", "busy")], null = True, blank = True, max_length=20)
 

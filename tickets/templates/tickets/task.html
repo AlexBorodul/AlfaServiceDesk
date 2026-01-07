@@ -7,10 +7,10 @@
     <div class="card-header">
         <h2 class="card-title">Заявка #{{ task.id }}</h2>
         <div>
-            <a href="{% url 'edit_task' task.id %}" class="btn btn-primary">
+            <a href="{% url 'tickets:edit_task' task.id %}" class="btn btn-primary">
                 <i class="fas fa-edit"></i> Редактировать
             </a>
-            <a href="{% url 'tasks' %}" class="btn btn-secondary">
+            <a href="{% url 'tickets:tasks' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Назад
             </a>
         </div>
@@ -132,7 +132,7 @@
         <!-- Форма для фидбека -->
         <div class="add-comment">
             <h4>Добавить комментарий</h4>
-            <form method="POST" action="{% url 'feedback' task.id %}" enctype="multipart/form-data">
+            <form method="POST" action="{% url 'tickets:feedback' task.id %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
                     <textarea name="text" class="form-control" placeholder="Введите ваш комментарий..." rows="3" required></textarea>

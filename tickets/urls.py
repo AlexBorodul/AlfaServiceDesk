@@ -4,8 +4,8 @@ from . import views
 app_name = 'tickets'
 
 urlpatterns = [
-    # Главная страница
-    path('', views.all_tasks, name='tasks'),
+    # Главная страница - перенаправляем на tasks
+    path('', views.all_tasks, name='home'),
 
     # Заявки
     path('tasks/', views.all_tasks, name='tasks'),
@@ -24,4 +24,7 @@ urlpatterns = [
     # Сотрудники
     path('employees/', views.all_users, name='employees'),
     path('employees/<int:user_id>/', views.user_by_id, name='employee_detail'),
+
+    # Дэшборд
+    path('dashboard/', views.dashboard, name='dashboard'),
 ]

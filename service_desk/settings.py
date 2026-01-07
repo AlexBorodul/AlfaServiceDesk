@@ -188,6 +188,6 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Настройки аутентификации
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'tasks'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'tickets:login'
+LOGIN_REDIRECT_URL = 'tickets:tasks'
+LOGOUT_REDIRECT_URL = 'tickets:login'
