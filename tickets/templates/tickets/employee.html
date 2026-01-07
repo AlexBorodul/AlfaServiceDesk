@@ -6,103 +6,47 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">Карточка сотрудника</h2>
-        <a href="{% url 'employees' %}" class="btn btn-secondary">
+        <a href="/employees/" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Назад к списку
         </a>
     </div>
 
-    <div style="padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
-            <div>
-                <h3 style="font-size: 1.5rem; color: var(--gray-900); margin-bottom: 0.5rem;">
-                    {{ employee.first_name }} {{ employee.second_name }} {{ employee.surname|default:"" }}
-                </h3>
-                <span class="badge {% if employee.role == 'admin' %}badge-in_progress{% else %}badge-waiting{% endif %}" style="font-size: 0.9rem;">
+    <div class="employee-details">
+        <div class="employee-header">
+            <div class="employee-info">
+                <h3>{{ employee.first_name }} {{ employee.second_name }} {{ employee.surname|default:"" }}</h3>
+                <span class="badge {% if employee.role == 'admin' %}badge-in_progress{% else %}badge-waiting{% endif %}">
                     {{ employee.get_role_display }}
                 </span>
             </div>
-            <div style="text-align: right;">
-                <a href="mailto:{{ employee.email }}" class="btn btn-primary">
-                    <i class="fas fa-envelope"></i> Написать
-                </a>
+            <div class="employee-contact">
+                <p><i class="fas fa-envelope"></i> {{ employee.email }}</p>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-id-card"></i> Имя
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    {{ employee.first_name }}
-                </p>
+        <div class="detail-grid">
+            <div class="detail-card">
+                <h5><i class="fas fa-id-card"></i> Имя</h5>
+                <p>{{ employee.first_name }}</p>
             </div>
 
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-id-card"></i> Фамилия
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    {{ employee.second_name|default:"Не указана" }}
-                </p>
+            <div class="detail-card">
+                <h5><i class="fas fa-id-card"></i> Фамилия</h5>
+                <p>{{ employee.second_name|default:"Не указана" }}</p>
             </div>
 
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-id-card"></i> Отчество
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    {{ employee.surname|default:"Не указано" }}
-                </p>
+            <div class="detail-card">
+                <h5><i class="fas fa-id-card"></i> Отчество</h5>
+                <p>{{ employee.surname|default:"Не указано" }}</p>
             </div>
 
-            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: var(--border-radius); border: 1px solid var(--gray-200);">
-                <h5 style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-envelope"></i> Email
-                </h5>
-                <p style="font-size: 1.125rem; font-weight: 500; color: var(--gray-800);">
-                    <a href="mailto:{{ employee.email }}" style="color: var(--primary-color); text-decoration: none;">
-                        {{ employee.email }}
-                    </a>
+            <div class="detail-card">
+                <h5><i class="fas fa-envelope"></i> Email</h5>
+                <p>
+                    <a href="mailto:{{ employee.email }}">{{ employee.email }}</a>
                 </p>
             </div>
         </div>
-
-        {% if task_list %}
-        <div>
-            <h4 style="font-size: 1.125rem; color: var(--gray-800); margin-bottom: 1rem;">Заявки сотрудника</h4>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Тема</th>
-                            <th>Статус</th>
-                            <th>Дата создания</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for task in task_list %}
-                        <tr>
-                            <td>#{{ task.id }}</td>
-                            <td>
-                                <a href="{% url 'task' task.id %}" style="color: var(--primary-color);">
-                                    {{ task.title|truncatechars:50 }}
-                                </a>
-                            </td>
-                            <td>
-                                <span class="badge badge-{{ task.status }}">
-                                    {{ task.get_status_display }}
-                                </span>
-                            </td>
-                            <td>{{ task.created_at|date:"d.m.Y" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

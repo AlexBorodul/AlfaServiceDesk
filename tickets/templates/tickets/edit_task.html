@@ -6,96 +6,20 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">Редактировать заявку #{{ task.id }}</h2>
-        <div style="display: flex; gap: 0.5rem;">
-            <a href="{% url 'task' task.id %}" class="btn btn-secondary">
-                <i class="fas fa-eye"></i> Просмотр
-            </a>
-            <a href="{% url 'tasks' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Назад
-            </a>
+        <div>
+            <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">Просмотр</a>
+            <a href="{% url 'tasks' %}" class="btn btn-secondary">Назад</a>
         </div>
     </div>
 
     <div class="card-body">
-        <form method="POST">
+        <form method="post">
             {% csrf_token %}
+            {{ form.as_p }}
 
-            <div class="form-group">
-                <label class="form-label">Заголовок *</label>
-                <input type="text" name="title" class="form-control" value="{{ task.title }}" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Статус</label>
-                <select name="status" class="form-control">
-                    <option value="waiting" {% if task.status == 'waiting' %}selected{% endif %}>Ожидание</option>
-                    <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>В работе</option>
-                    <option value="done" {% if task.status == 'done' %}selected{% endif %}>Выполнено</option>
-                    <option value="rework" {% if task.status == 'rework' %}selected{% endif %}>На доработку</option>
-                    <option value="rejected" {% if task.status == 'rejected' %}selected{% endif %}>Отклонено</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Описание проблемы *</label>
-                <textarea name="problem" class="form-control" rows="5" required>{{ task.problem }}</textarea>
-            </div>
-
-            <div style="display: flex; gap: 1rem;">
-                <div class="form-group" style="flex: 1;">
-                    <label class="form-label">Приоритет</label>
-                    <select name="priority" class="form-control">
-                        <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Низкий</option>
-                        <option value="medium" {% if task.priority == 'medium' or not task.priority %}selected{% endif %}>Средний</option>
-                        <option value="high" {% if task.priority == 'high' %}selected{% endif %}>Высокий</option>
-                        <option value="critical" {% if task.priority == 'critical' %}selected{% endif %}>Критический</option>
-                    </select>
-                </div>
-
-                <div class="form-group" style="flex: 1;">
-                    <label class="form-label">Категория</label>
-                    <select name="category" class="form-control">
-                        <option value="" {% if not task.category %}selected{% endif %}>Не выбрано</option>
-                        <option value="it" {% if task.category == 'it' %}selected{% endif %}>IT проблема</option>
-                        <option value="office" {% if task.category == 'office' %}selected{% endif %}>Офисное оборудование</option>
-                        <option value="hr" {% if task.category == 'hr' %}selected{% endif %}>Кадровый вопрос</option>
-                        <option value="other" {% if task.category == 'other' %}selected{% endif %}>Другое</option>
-                    </select>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 1rem;">
-                <div class="form-group" style="flex: 1;">
-                    <label class="form-label">Офис</label>
-                    <select name="office" class="form-control">
-                        <option value="" {% if not task.office %}selected{% endif %}>Не выбрано</option>
-                        <option value="main" {% if task.office == 'main' %}selected{% endif %}>Главный офис</option>
-                        <option value="branch1" {% if task.office == 'branch1' %}selected{% endif %}>Филиал 1</option>
-                        <option value="branch2" {% if task.office == 'branch2' %}selected{% endif %}>Филиал 2</option>
-                    </select>
-                </div>
-
-                <div class="form-group" style="flex: 1;">
-                    <label class="form-label">Исполнитель</label>
-                    <select name="worker" class="form-control">
-                        <option value="">Не назначен</option>
-                        {% for employee in employees %}
-                        <option value="{{ employee.id }}" {% if task.worker_id == employee.id %}selected{% endif %}>
-                            {{ employee.first_name }} {{ employee.second_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Сохранить изменения
-                </button>
-                <a href="{% url 'task' task.id %}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Отмена
-                </a>
-            </div>
+            <button type="submit" class="btn btn-primary">
+                Сохранить
+            </button>
         </form>
     </div>
 </div>
