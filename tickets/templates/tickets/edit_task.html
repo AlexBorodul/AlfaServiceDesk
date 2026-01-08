@@ -1,26 +1,442 @@
 {% extends 'base.html' %}
 
-{% block title %}Редактировать заявку - Alfa Service Desk{% endblock %}
+{% block title %}Редактировать заявку #{{ task.id }} - Alfa Service Desk{% endblock %}
 
 {% block content %}
-<div class="card">
+<div class="page-header">
+    <div class="breadcrumb">
+        <div class="breadcrumb-item">
+            <a href="{% url 'tasks' %}" class="breadcrumb-link">
+                <i class="fas fa-tasks"></i>
+                <span>Мои заявки</span>
+            </a>
+        </div>
+        <div class="breadcrumb-item">
+            <a href="{% url 'task_detail' task.id %}" class="breadcrumb-link">
+                <i class="fas fa-eye"></i>
+                <span>Заявка #{{ task.id }}</span>
+            </a>
+        </div>
+        <div class="breadcrumb-item">
+            <span class="breadcrumb-current">
+                <i class="fas fa-edit"></i>
+                <span>Редактирование</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="card edit-task-card">
     <div class="card-header">
-        <h2 class="card-title">Редактировать заявку #{{ task.id }}</h2>
-        <div>
-            <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">Просмотр</a>
-            <a href="{% url 'tasks' %}" class="btn btn-secondary">Назад</a>
+        <div class="task-header-info">
+            <h2 class="card-title">
+                <i class="fas fa-edit text-primary"></i>
+                Редактирование заявки #{{ task.id }}
+            </h2>
+            <div class="task-meta">
+                <span class="task-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    Создана: {{ task.created_at|date:"d.m.Y H:i" }}
+                </span>
+                <span class="task-meta-item">
+                    <i class="fas fa-user"></i>
+                    Автор: {{ task.author.username }}
+                </span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">
+                <i class="fas fa-eye"></i>
+                Просмотр
+            </a>
+            <a href="{% url 'tasks' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Назад
+            </a>
         </div>
     </div>
 
     <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
+        <div class="form-container">
+            <form method="post" class="edit-task-form" enctype="multipart/form-data">
+                {% csrf_token %}
 
-            <button type="submit" class="btn btn-primary">
-                Сохранить
-            </button>
-        </form>
+                <!-- Основная информация -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Основная информация
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_title" class="form-label">
+                                <i class="fas fa-heading"></i>
+                                Название заявки
+                            </label>
+                            <input type="text" name="title" id="id_title" class="form-control"
+                                   value="{{ form.title.value|default:'' }}"
+                                   placeholder="Введите краткое название заявки" required>
+                            <div class="form-text">Краткое описание проблемы</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_category" class="form-label">
+                                <i class="fas fa-folder"></i>
+                                Категория
+                            </label>
+                            <select name="category" id="id_category" class="form-control">
+                                <option value="">Выберите категорию</option>
+                                {% for value, label in form.category.field.choices %}
+                                    <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_priority" class="form-label">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Приоритет
+                            </label>
+                            <select name="priority" id="id_priority" class="form-control">
+                                {% for value, label in form.priority.field.choices %}
+                                    <option value="{{ value }}" {% if form.priority.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Описание проблемы -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-file-alt"></i>
+                        Описание проблемы
+                    </h3>
+
+                    <div class="form-group">
+                        <label for="id_problem" class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            Подробное описание
+                        </label>
+                        <textarea name="problem" id="id_problem" class="form-control"
+                                  rows="6" placeholder="Опишите проблему подробно...">{{ form.problem.value|default:'' }}</textarea>
+                        <div class="form-text">
+                            Опишите проблему максимально подробно. Укажите шаги воспроизведения, ожидаемый и фактический результат.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ответственные и статус -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-users"></i>
+                        Ответственные и статус
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_worker" class="form-label">
+                                <i class="fas fa-user-check"></i>
+                                Исполнитель
+                            </label>
+                            <select name="worker" id="id_worker" class="form-control">
+                                <option value="">Не назначен</option>
+                                {% for value, label in form.worker.field.choices %}
+                                    <option value="{{ value }}" {% if form.worker.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_status" class="form-label">
+                                <i class="fas fa-tag"></i>
+                                Статус
+                            </label>
+                            <select name="status" id="id_status" class="form-control">
+                                {% for value, label in form.status.field.choices %}
+                                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вложения -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-paperclip"></i>
+                        Вложения
+                    </h3>
+
+                    <div class="form-group">
+                        <label for="id_file" class="form-label">
+                            <i class="fas fa-file-upload"></i>
+                            Файл
+                        </label>
+                        <div class="file-upload-container">
+                            <input type="file" name="file" id="id_file" class="form-control-file">
+                            <div class="form-text">Максимальный размер: 10 MB. Поддерживаемые форматы: PDF, JPG, PNG, DOC</div>
+
+                            {% if task.file %}
+                            <div class="current-file">
+                                <i class="fas fa-paperclip"></i>
+                                Текущий файл: <a href="{{ task.file.url }}" target="_blank">{{ task.file.name|cut:'uploads/' }}</a>
+                                <label class="remove-file">
+                                    <input type="checkbox" name="file-clear"> Удалить файл
+                                </label>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопки действий -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i>
+                        Сохранить изменения
+                    </button>
+                    <a href="{% url 'task_detail' task.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Отменить
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .edit-task-card {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .task-header-info {
+        margin-bottom: 1rem;
+    }
+
+    .task-meta {
+        display: flex;
+        gap: 2rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .task-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    .task-meta-item i {
+        color: var(--gray-500);
+    }
+
+    .form-container {
+        padding: 1rem 0;
+    }
+
+    .form-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .form-section:last-of-type {
+        border-bottom: none;
+        margin-bottom: 1rem;
+    }
+
+    .form-section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.125rem;
+        color: var(--gray-800);
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
+        background: var(--gray-50);
+        border-radius: var(--border-radius);
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .form-section-title i {
+        color: var(--primary-color);
+    }
+
+    .edit-task-form .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: var(--gray-700);
+    }
+
+    .edit-task-form .form-label i {
+        color: var(--gray-500);
+        width: 16px;
+        text-align: center;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s;
+        background: white;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
+
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
+    .form-text {
+        color: var(--gray-500);
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+        line-height: 1.4;
+    }
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+        flex-wrap: wrap;
+    }
+
+    .form-actions .btn-lg {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+    }
+
+    .file-upload-container {
+        background: var(--gray-50);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        border: 2px dashed var(--gray-300);
+    }
+
+    .form-control-file {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        background: white;
+    }
+
+    .current-file {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--gray-200);
+    }
+
+    .current-file a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .current-file a:hover {
+        text-decoration: underline;
+    }
+
+    .remove-file {
+        display: block;
+        margin-top: 0.5rem;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    .remove-file input {
+        margin-right: 0.5rem;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .form-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .task-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .edit-task-form textarea {
+            min-height: 120px;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .edit-task-card {
+            max-width: 800px;
+        }
+    }
+</style>
 {% endblock %}

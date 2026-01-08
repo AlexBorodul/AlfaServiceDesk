@@ -93,6 +93,10 @@ def edit_task(request, task_id):
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
+            if not task.office:
+                task.office = task.author.office
+            if not task.worker:
+                WorkerController.auto_select_worker(task)
             form.save()
             return redirect("task_detail", task_id=task.id)
     else:

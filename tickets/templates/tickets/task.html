@@ -21,7 +21,7 @@
             <div>
                 <h3>{{ task.title }}</h3>
                 <span class="badge badge-{{ task.status }}">
-                    {{ task.status }}
+                    {{ task.get_status_display }}
                 </span>
             </div>
             <div class="task-meta">
