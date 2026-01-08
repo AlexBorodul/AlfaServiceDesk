@@ -58,6 +58,11 @@
                             <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            {% if 1 >= groups_count %}
+                            <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-primary">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>

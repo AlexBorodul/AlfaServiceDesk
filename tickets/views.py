@@ -109,6 +109,14 @@ def edit_task(request, task_id):
 
 @permission_classes([IsAuthenticated])
 @login_required
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()
+    return redirect('tasks')
+
+
+@permission_classes([IsAuthenticated])
+@login_required
 def send_message(request):
     """Отправка email"""
     if request.method == 'POST':
