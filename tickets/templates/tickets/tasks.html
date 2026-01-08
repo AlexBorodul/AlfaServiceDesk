@@ -48,7 +48,7 @@
                             {{ task.get_status_display }}
                         </span>
                     </td>
-                    <td>{{ task.priority|default:"Обычный" }}</td>
+                    <td>{{ task.get_priority_display|default:"Обычный" }}</td>
                     <td>{{ task.created_at|date:"d.m.Y H:i" }}</td>
                     <td>
                         <div class="action-buttons">
