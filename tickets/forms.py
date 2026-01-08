@@ -75,7 +75,7 @@ class TaskForm(forms.ModelForm):
             'status': 'Статус',
         }
 
-    def __init__(self, *args, **kwargs):
+    '''def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Настраиваем queryset для поля worker
         self.fields['worker'].queryset = Employee.objects.all().order_by('first_name')
@@ -86,7 +86,17 @@ class TaskForm(forms.ModelForm):
         # Делаем поле worker необязательным
         self.fields['worker'].required = False
         self.fields['worker'].empty_label = "Автоматический выбор"
-        self.fields['worker'].help_text = "Оставьте пустым для автоматического назначения"
+        self.fields['worker'].help_text = "Оставьте пустым для автоматического назначения" '''
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if self.user and hasattr(self.user, 'employee'):
+            employee = self.user.employee
+            # Автоматически выбираем офис сотрудника
+            if employee and employee.office:
+                self.fields['office'].initial = employee.office
 
 
 class SendEmailForm(forms.Form):

@@ -5,145 +5,320 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title">Заявка #{{ task.id }}</h2>
-        <div>
-            <a href="{% url 'tickets:edit_task' task.id %}" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Редактировать
-            </a>
-            <a href="{% url 'tickets:tasks' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Назад
-            </a>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="card-title mb-0">
+                    <i class="fas fa-ticket-alt"></i> Заявка #{{ task.id }}
+                </h2>
+                <small class="text-muted">
+                    <i class="fas fa-calendar"></i> Создана: {{ task.created_at|date:"d.m.Y H:i" }}
+                </small>
+            </div>
+            <div class="d-flex gap-2">
+                {% if can_edit %}
+                <a href="{% url 'tickets:edit_task' task.id %}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Редактировать
+                </a>
+                {% endif %}
+                <a href="{% url 'tickets:tasks' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="task-content">
-        <div class="task-header">
-            <div>
-                <h3>{{ task.title }}</h3>
-                <span class="badge badge-{{ task.status }}">
-                    {{ task.status }}
-                </span>
-            </div>
-            <div class="task-meta">
-                <div>Создана: {{ task.created_at|date:"d.m.Y H:i" }}</div>
-            </div>
-        </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="task-header mb-4">
+                    <h3 class="mb-2">{{ task.title }}</h3>
+                    <div class="d-flex gap-3 align-items-center">
+                        <span class="badge
+                            {% if task.status == 'done' %}badge-success
+                            {% elif task.status == 'in_progress' %}badge-info
+                            {% elif task.status == 'waiting' %}badge-secondary
+                            {% elif task.status == 'rework' %}badge-warning
+                            {% elif task.status == 'rejected' %}badge-danger
+                            {% else %}badge-secondary{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                        <span class="badge
+                            {% if task.priority == 'critical' %}badge-danger
+                            {% elif task.priority == 'high' %}badge-warning
+                            {% elif task.status == 'normal' %}badge-primary
+                            {% elif task.priority == 'low' %}badge-success
+                            {% else %}badge-secondary{% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                </div>
 
-        <div class="task-section">
-            <h4>Описание проблемы</h4>
-            <div class="task-description">
-                {{ task.problem|linebreaks }}
-            </div>
-        </div>
-
-        <div class="detail-grid">
-            <div class="detail-card">
-                <h5><i class="fas fa-user"></i> Автор</h5>
-                {% if task.author %}
-                        {{ task.author.first_name }} {{ task.author.second_name }}
-                    {% else %}
-                        <span class="text-muted">Не назначен</span>
-                {% endif %}
+                <div class="task-section mb-4">
+                    <h4 class="mb-3"><i class="fas fa-file-alt"></i> Описание проблемы</h4>
+                    <div class="task-description bg-light p-3 rounded">
+                        {{ task.problem|linebreaks }}
+                    </div>
+                </div>
             </div>
 
-            <div class="detail-card">
-                <h5><i class="fas fa-user-tie"></i> Исполнитель</h5>
-                <p>
-                    {% if task.worker %}
-                        {{ task.worker.first_name }} {{ task.worker.second_name }}
-                    {% else %}
-                        <span class="text-muted">Не назначен</span>
+            <div class="col-md-4">
+                <div class="task-info-card">
+                    <h4 class="mb-3"><i class="fas fa-info-circle"></i> Информация</h4>
+
+                    <div class="info-item mb-3">
+                        <div class="info-label">Автор</div>
+                        <div class="info-value">
+                            {% if task.author %}
+                                {{ task.author.first_name }} {{ task.author.second_name }}
+                                <br><small class="text-muted">{{ task.author.email }}</small>
+                            {% else %}
+                                <span class="text-muted">Не указан</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="info-item mb-3">
+                        <div class="info-label">Исполнитель</div>
+                        <div class="info-value">
+                            {% if task.worker %}
+                                {{ task.worker.first_name }} {{ task.worker.second_name }}
+                                <br><small class="text-muted">{{ task.worker.email }}</small>
+                                <br><small class="text-muted">Роль: {{ task.worker.get_role_display }}</small>
+                            {% else %}
+                                <span class="text-muted">Не назначен</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="info-item mb-3">
+                        <div class="info-label">Категория</div>
+                        <div class="info-value">
+                            {{ task.category.name|default:"Не указана" }}
+                        </div>
+                    </div>
+
+                    <div class="info-item mb-3">
+                        <div class="info-label">Офис</div>
+                        <div class="info-value">
+                            {{ task.office.name|default:"Не указан" }}
+                        </div>
+                    </div>
+
+                    {% if can_change_status %}
+                    <div class="info-item mb-3">
+                        <div class="info-label">Изменить статус</div>
+                        <div class="info-value">
+                            <form method="POST" class="d-flex gap-2">
+                                {% csrf_token %}
+                                <select name="status" class="form-control form-control-sm">
+                                    {% for status_key, status_name in status_choices %}
+                                        <option value="{{ status_key }}" {% if task.status == status_key %}selected{% endif %}>
+                                            {{ status_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" name="change_status" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     {% endif %}
-                </p>
-            </div>
-
-            <div class="detail-card">
-                <h5><i class="fas fa-tag"></i> Категория</h5>
-                <p>{{ task.category|default:"Не указана" }}</p>
-            </div>
-
-            <div class="detail-card">
-                <h5><i class="fas fa-building"></i> Офис</h5>
-                <p>{{ task.office|default:"Не указан" }}</p>
-            </div>
-
-            <div class="detail-card">
-                <h5><i class="fas fa-flag"></i> Приоритет</h5>
-                <p>{{ task.get_priority_display|default:"Обычный" }}</p>
+                </div>
             </div>
         </div>
 
-        {% if task.attachments.exists %}
-        <div class="task-section">
-            <h4>Прикрепленные файлы</h4>
-            <div class="attachments">
-                {% for attachment in task.attachments.all %}
-                <div class="attachment">
-                    <i class="fas fa-paperclip"></i>
-                    <a href="{{ attachment.file.url }}" target="_blank">
-                        {{ attachment.filename }}
-                    </a>
-                    <span class="file-size">{{ attachment.file.size|filesizeformat }}</span>
+        {% if attachments %}
+        <div class="task-section mb-4">
+            <h4 class="mb-3"><i class="fas fa-paperclip"></i> Прикрепленные файлы</h4>
+            <div class="attachments-list">
+                {% for attachment in attachments %}
+                <div class="attachment-item d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
+                    <div>
+                        <i class="fas fa-file me-2"></i>
+                        <a href="{{ attachment.file.url }}" target="_blank" class="text-decoration-none">
+                            {{ attachment.file.name|cut:'attachments/' }}
+                        </a>
+                        <small class="text-muted ms-2">{{ attachment.uploaded_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <small class="text-muted">{{ attachment.file.size|filesizeformat }}</small>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
-    </div>
-</div>
 
-<!-- Фидбек/комментарии -->
-<div class="card" style="margin-top: 1.5rem;">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fas fa-comments"></i> Обратная связь
-        </h3>
-    </div>
-
-    <div class="comments-container">
-        {% if comments %}
-        <div class="comments-list">
-            {% for comment in comments %}
-            <div class="comment">
-                <div class="comment-header">
-                    <div class="comment-author">
-                        <div class="avatar-small">
-                            {{ comment.author.username|first|upper }}
+        {% if actions %}
+        <div class="task-section mb-4">
+            <h4 class="mb-3"><i class="fas fa-history"></i> История действий</h4>
+            <div class="timeline">
+                {% for action in actions %}
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <strong>
+                                {% if action.author %}
+                                    {{ action.author.first_name }} {{ action.author.second_name }}
+                                {% else %}
+                                    Система
+                                {% endif %}
+                            </strong>
+                            <small class="text-muted">{{ action.created_at|date:"d.m.Y H:i" }}</small>
                         </div>
-                        <div>
-                            <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
-                            <small>{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                        <div class="timeline-body">
+                            {{ action.description }}
                         </div>
                     </div>
                 </div>
-                <div class="comment-body">
-                    {{ comment.text|linebreaks }}
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <i class="fas fa-comment-slash"></i>
-            <p>Пока нет комментариев</p>
         </div>
         {% endif %}
 
-        <!-- Форма для фидбека -->
-        <div class="add-comment">
-            <h4>Добавить комментарий</h4>
-            <form method="POST" action="{% url 'tickets:feedback' task.id %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group">
-                    <textarea name="text" class="form-control" placeholder="Введите ваш комментарий..." rows="3" required></textarea>
+        <div class="task-section">
+            <h4 class="mb-3"><i class="fas fa-comments"></i> Комментарии</h4>
+
+            {% if comments %}
+            <div class="comments-list mb-4">
+                {% for comment in comments %}
+                <div class="comment-item mb-3 p-3 bg-light rounded">
+                    <div class="comment-header d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-small me-2">
+                                {{ comment.author.first_name|first|upper }}{{ comment.author.second_name|first|upper }}
+                            </div>
+                            <div>
+                                <strong>
+                                    {{ comment.author.first_name }} {{ comment.author.second_name }}
+                                </strong>
+                                <small class="text-muted d-block">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comment-body">
+                        {{ comment.text|linebreaks }}
+                    </div>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> Отправить
-                    </button>
-                </div>
-            </form>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="add-comment">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <textarea name="comment_text" class="form-control"
+                                  placeholder="Введите ваш комментарий..."
+                                  rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Добавить комментарий
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .task-info-card {
+        background: var(--gray-50);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid var(--gray-200);
+    }
+
+    .info-item {
+        border-bottom: 1px solid var(--gray-200);
+        padding-bottom: 1rem;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: var(--gray-800);
+    }
+
+    .attachment-item:hover {
+        background-color: var(--gray-100) !important;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -1rem;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        background-color: var(--primary-color);
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 0 0 2px var(--primary-color);
+    }
+
+    .timeline-content {
+        background: var(--gray-50);
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--gray-200);
+    }
+
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .avatar-small {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .comment-item {
+        border-left: 3px solid var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+        .card-header .d-flex {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start !important;
+        }
+
+        .task-info-card {
+            margin-top: 2rem;
+        }
+    }
+</style>
 {% endblock %}

@@ -5,113 +5,265 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title">Создать заявку</h2>
-        <a href="{% url 'tickets:tasks' %}" class="btn btn-secondary">Назад</a>
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="card-title mb-0">
+                <i class="fas fa-plus-circle"></i> Создать заявку
+            </h2>
+            <a href="{% url 'tickets:tasks' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Назад
+            </a>
+        </div>
     </div>
 
     <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
 
-            <!-- Основные поля формы -->
-            <div class="form-group">
-                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-                {{ form.title }}
+            <!-- Сообщения об ошибках -->
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                Пожалуйста, исправьте ошибки ниже.
+                {% if form.non_field_errors %}
+                <ul>
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Тема заявки -->
+            <div class="form-group mb-4">
+                <label for="id_title" class="form-label">
+                    <i class="fas fa-heading"></i> Тема заявки *
+                </label>
+                <input type="text" name="title" id="id_title"
+                       class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+                       value="{{ form.title.value|default:'' }}"
+                       placeholder="Краткое описание проблемы"
+                       required>
                 {% if form.title.errors %}
-                <div class="text-danger">{{ form.title.errors }}</div>
+                <div class="invalid-feedback">
+                    {% for error in form.title.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
                 {% endif %}
+                <small class="form-text text-muted">
+                    Кратко опишите суть проблемы
+                </small>
             </div>
 
-            <div class="form-group">
-                <label for="{{ form.problem.id_for_label }}">{{ form.problem.label }}</label>
-                {{ form.problem }}
+            <!-- Описание проблемы -->
+            <div class="form-group mb-4">
+                <label for="id_problem" class="form-label">
+                    <i class="fas fa-align-left"></i> Описание проблемы *
+                </label>
+                <textarea name="problem" id="id_problem"
+                          class="form-control {% if form.problem.errors %}is-invalid{% endif %}"
+                          rows="6"
+                          placeholder="Опишите проблему подробно..."
+                          required>{{ form.problem.value|default:'' }}</textarea>
                 {% if form.problem.errors %}
-                <div class="text-danger">{{ form.problem.errors }}</div>
+                <div class="invalid-feedback">
+                    {% for error in form.problem.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
                 {% endif %}
+                <small class="form-text text-muted">
+                    Опишите проблему максимально подробно
+                </small>
             </div>
 
-            <div class="row">
+            <div class="row mb-4">
+                <!-- Категория -->
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
-                        {{ form.category }}
+                        <label for="id_category" class="form-label">
+                            <i class="fas fa-folder"></i> Категория *
+                        </label>
+                        <select name="category" id="id_category"
+                                class="form-control {% if form.category.errors %}is-invalid{% endif %}"
+                                required>
+                            <option value="">Выберите категорию</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}"
+                                    {% if form.category.value == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
                         {% if form.category.errors %}
-                        <div class="text-danger">{{ form.category.errors }}</div>
+                        <div class="invalid-feedback">
+                            {% for error in form.category.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                 </div>
+
+                <!-- Приоритет -->
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="{{ form.priority.id_for_label }}">{{ form.priority.label }}</label>
-                        {{ form.priority }}
+                        <label for="id_priority" class="form-label">
+                            <i class="fas fa-flag"></i> Приоритет *
+                        </label>
+                        <select name="priority" id="id_priority"
+                                class="form-control {% if form.priority.errors %}is-invalid{% endif %}"
+                                required>
+                            <option value="">Выберите приоритет</option>
+                            <option value="low" {% if form.priority.value == 'low' %}selected{% endif %}>Низкий</option>
+                            <option value="normal" {% if form.priority.value == 'normal' %}selected{% endif %}>Обычный</option>
+                            <option value="high" {% if form.priority.value == 'high' %}selected{% endif %}>Высокий</option>
+                            <option value="critical" {% if form.priority.value == 'critical' %}selected{% endif %}>Критический</option>
+                        </select>
                         {% if form.priority.errors %}
-                        <div class="text-danger">{{ form.priority.errors }}</div>
+                        <div class="invalid-feedback">
+                            {% for error in form.priority.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row mb-4">
+                <!-- Офис -->
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="{{ form.office.id_for_label }}">{{ form.office.label }}</label>
-                        {{ form.office }}
+                        <label for="id_office" class="form-label">
+                            <i class="fas fa-building"></i> Офис
+                        </label>
+                        <select name="office" id="id_office"
+                                class="form-control {% if form.office.errors %}is-invalid{% endif %}">
+                            <option value="">Выберите офис</option>
+                            {% for office in form.office.field.queryset %}
+                            <option value="{{ office.id }}"
+                                    {% if form.office.value == office.id or office.id == current_employee.office.id %}selected{% endif %}>
+                                {{ office.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
                         {% if form.office.errors %}
-                        <div class="text-danger">{{ form.office.errors }}</div>
+                        <div class="invalid-feedback">
+                            {% for error in form.office.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                 </div>
+
+                <!-- Исполнитель -->
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="{{ form.worker.id_for_label }}">{{ form.worker.label }}</label>
-                        {{ form.worker }}
-                        <small class="form-text text-muted">{{ form.worker.help_text }}</small>
+                        <label for="id_worker" class="form-label">
+                            <i class="fas fa-user-tie"></i> Исполнитель
+                        </label>
+                        <select name="worker" id="id_worker"
+                                class="form-control {% if form.worker.errors %}is-invalid{% endif %}">
+                            <option value="">Автоматический выбор</option>
+                            {% for worker in form.worker.field.queryset %}
+                            <option value="{{ worker.id }}"
+                                    {% if form.worker.value == worker.id %}selected{% endif %}>
+                                {{ worker.first_name }} {{ worker.second_name }}
+                                {% if worker.role %}({{ worker.get_role_display }}){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
                         {% if form.worker.errors %}
-                        <div class="text-danger">{{ form.worker.errors }}</div>
+                        <div class="invalid-feedback">
+                            {% for error in form.worker.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
+                        <small class="form-text text-muted">
+                            Оставьте пустым для автоматического назначения
+                        </small>
                     </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
-                {{ form.file }}
+            <!-- Файл -->
+            <div class="form-group mb-4">
+                <label for="id_file" class="form-label">
+                    <i class="fas fa-paperclip"></i> Прикрепленный файл
+                </label>
+                <input type="file" name="file" id="id_file"
+                       class="form-control {% if form.file.errors %}is-invalid{% endif %}">
                 {% if form.file.errors %}
-                <div class="text-danger">{{ form.file.errors }}</div>
+                <div class="invalid-feedback">
+                    {% for error in form.file.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
                 {% endif %}
+                <small class="form-text text-muted">
+                    Поддерживаемые форматы: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT, ZIP, RAR
+                </small>
             </div>
 
-            <button type="submit" class="btn btn-primary">
-                Создать заявку
-            </button>
+            <!-- Кнопки -->
+            <div class="form-actions mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-check-circle"></i> Создать заявку
+                </button>
+                <a href="{% url 'tickets:tasks' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
         </form>
     </div>
 </div>
 
 <style>
-    .form-group {
-        margin-bottom: 1.5rem;
+    .form-label {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--gray-700);
+    .form-label i {
+        color: var(--primary-color);
+        width: 20px;
+        text-align: center;
     }
 
     .form-control {
-        width: 100%;
-        padding: 0.75rem;
         border: 1px solid var(--gray-300);
         border-radius: var(--border-radius);
+        padding: 0.75rem 1rem;
         font-size: 0.875rem;
+        transition: all 0.2s;
     }
 
     .form-control:focus {
-        outline: none;
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+        outline: none;
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--danger-color);
+    }
+
+    .form-control.is-invalid:focus {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .invalid-feedback {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
     }
 
     textarea.form-control {
@@ -119,14 +271,34 @@
         resize: vertical;
     }
 
-    .text-danger {
-        font-size: 0.875rem;
+    .form-text {
+        color: var(--gray-500);
+        font-size: 0.75rem;
         margin-top: 0.25rem;
     }
 
-    .form-text {
-        font-size: 0.75rem;
-        margin-top: 0.25rem;
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+        .row {
+            gap: 1rem;
+        }
+
+        .col-md-6 {
+            width: 100%;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
