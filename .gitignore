@@ -20,3 +20,6 @@ docker-compose.override.yml
 # VSCode / JetBrains
 .vscode/
 .idea/
+
+# Project
+employees.yaml
