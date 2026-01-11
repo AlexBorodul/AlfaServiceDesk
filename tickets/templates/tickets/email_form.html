@@ -26,9 +26,9 @@
                 <select name="recipient" class="form-control" required>
                     <option value="">Выберите получателя</option>
                     {% for employee in employees %}
-                    <option value="{{ employee.email }}">
-                        {{ employee.first_name }} {{ employee.second_name }} ({{ employee.email }})
-                    </option>
+                        <option value="{{ employee.id }}">
+                            {{ employee.first_name }} {{ employee.second_name }} ({{ employee.email }})
+                        </option>
                     {% endfor %}
                 </select>
             </div>
