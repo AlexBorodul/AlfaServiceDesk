@@ -22,11 +22,10 @@ def create_employees_from_yaml(apps, schema_editor, file_path='employees.yaml'):
             employee.specialization.set(category_types)
             user_employee = User(
                 username = employee_data['username'],
-                password = employee_data['password'],
                 email = employee_data['email'],
                 employee = employee,
                 )
-            user_employee.save()
+            user_employee.set_password(employee_data['password'])
             user_employee.groups.add(author_group, worker_group)
 
 
