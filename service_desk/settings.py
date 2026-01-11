@@ -82,27 +82,27 @@ WSGI_APPLICATION = "service_desk.wsgi.application"
 
 
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': env('DATABASE_NAME'),
-#        'USER': env('DATABASE_USER'),
-#        'PASSWORD': env('DATABASE_PASSWORD'),
-#        'HOST': env('DATABASE_HOST'),
-#        'PORT': env('DATABASE_PORT'),
-#    }
-#}
+DATABASES = {
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': env('DATABASE_NAME'),
+       'USER': env('DATABASE_USER'),
+       'PASSWORD': env('DATABASE_PASSWORD'),
+       'HOST': env('DATABASE_HOST'),
+       'PORT': env('DATABASE_PORT'),
+   }
+}
 
 # import os
 # from dotenv import load_dotenv
 # load_dotenv()
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
