@@ -93,6 +93,10 @@ def edit_task(request, task_id):
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
+            if not task.office:
+                task.office = task.author.office
+            if not task.worker:
+                WorkerController.auto_select_worker(task)
             form.save()
             return redirect("task_detail", task_id=task.id)
     else:
@@ -102,6 +106,14 @@ def edit_task(request, task_id):
         "form": form,
         "task": task
     })
+
+@permission_classes([IsAuthenticated])
+@login_required
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()
+    return redirect('tasks')
+
 
 @permission_classes([IsAuthenticated])
 @login_required

@@ -10,6 +10,7 @@ urlpatterns = [
     path('tasks/create/', views.create_task, name='create_task'),
     path('tasks/<int:task_id>/', views.get_task, name='task_detail'),
     path('tasks/<int:task_id>/edit/', views.edit_task, name='edit_task'),
+    path('tasks/<int:task_id>/delete', views.delete_task, name='delete_task'),
 
     # Аутентификация
     path('login/', views.login_view, name='login'),
