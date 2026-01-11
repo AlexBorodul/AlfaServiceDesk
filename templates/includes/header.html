@@ -3,21 +3,29 @@
         <i class="fas fa-headset"></i>
         <span>Alfa Service Desk</span>
     </div>
-    {% if user.is_authenticated %}
-    <div class="user-info">
-        <div class="avatar">
-            {{ user.username|first|upper }}
-        </div>
-        <div>
-            <div class="user-name">{{ user.username }}</div>
-            <div class="user-role">
-                {% if user.is_superuser %}
-                    Администратор
-                {% else %}
-                    Сотрудник
-                {% endif %}
+
+    <div class="header-actions">
+        {% if user.is_authenticated %}
+        <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+        </button>
+
+        <div class="user-info">
+            <div class="avatar">
+                {{ user.username|first|upper }}
+            </div>
+            <div>
+                <div class="user-name">{{ user.username }}</div>
+                <div class="user-role">
+                    {% if user.is_superuser %}
+                        Администратор
+                    {% else %}
+                        Сотрудник
+                    {% endif %}
+                </div>
             </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 </header>
