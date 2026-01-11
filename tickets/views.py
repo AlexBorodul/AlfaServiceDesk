@@ -11,6 +11,7 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from tickets.workerController import WorkerController
 from tickets.models import Task, CategoryType, Employee, User
+from tickets.notifications.email_service import EmailNotificationService
 from tickets.forms import TaskForm, SendEmailForm, FeedbackForm
 
 
@@ -118,17 +119,39 @@ def delete_task(request, task_id):
 @permission_classes([IsAuthenticated])
 @login_required
 def send_message(request):
-    """Отправка email"""
-    if request.method == 'POST':
-        form = SendEmailForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Здесь будет логика отправки email
-            messages.success(request, 'Сообщение успешно отправлено!')
-            return redirect('tasks')
-    else:
-        form = SendEmailForm()
+    if request.method == "POST":
+        subject = request.POST.get("subject")
+        message = request.POST.get("message")
+        employee_id = request.POST.get("recipient")
+        files = request.FILES.getlist("attachments")
 
-    return render(request, 'tickets/email_form.html', {"form": form})
+        if not subject or not message or not employee_id:
+            messages.error(request, "Заполните все обязательные поля")
+            return redirect("send_email")
+
+        try:
+            employee = Employee.objects.get(id=employee_id)
+        except Employee.DoesNotExist:
+            messages.error(request, "Получатель не найден")
+            return redirect("send_email")
+
+        EmailNotificationService.send(
+            subject=subject,
+            message=message,
+            recipient=employee.email,
+            files=files
+        )
+
+        messages.success(request, f"Письмо отправлено: {employee.email}")
+        return redirect("send_email")
+
+    employees = Employee.objects.all()
+
+    return render(
+        request,
+        "tickets/email_form.html",
+        {"employees": employees}
+    )
 
 @permission_classes([IsAuthenticated])
 @login_required
